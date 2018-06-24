@@ -18,7 +18,7 @@ perfbench works with Python 3.3 or higher.
 ## Installation
 
 ## Usage
-
+case1:
 ```python
 import numpy as np
 from perfbench.process import *
@@ -46,8 +46,10 @@ bm = Benchmark(
 bm.run()
 bm.show()
 ```
-![plot1](https://github.com/Hasenpfote/perfbench/tree/master/docs/plot1.png)
+![plot1](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png)
 
+
+case2:
 ```python
 import numpy as np
 from perfbench.process import *
@@ -77,7 +79,7 @@ bm = Benchmark(
 bm.run()
 bm.show()
 ```
-![plot2](https://github.com/Hasenpfote/perfbench/tree/master/docs/plot2.png)
+![plot2](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png)
 
 ## License
 This software is released under the MIT License, see LICENSE.

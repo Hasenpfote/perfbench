@@ -27,6 +27,8 @@ Installation
 Usage
 -----
 
+case1:
+
 .. code:: python
 
    import numpy as np
@@ -55,10 +57,12 @@ Usage
    bm.run()
    bm.show()
 
-.. figure:: https://github.com/Hasenpfote/perfbench/tree/master/docs/plot1.png
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png
    :alt: plot1
 
    plot1
+
+case2:
 
 .. code:: python
 
@@ -90,7 +94,7 @@ Usage
    bm.run()
    bm.show()
 
-.. figure:: https://github.com/Hasenpfote/perfbench/tree/master/docs/plot2.png
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png
    :alt: plot2
 
    plot2
