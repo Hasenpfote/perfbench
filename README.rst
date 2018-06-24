@@ -1,4 +1,6 @@
 `License <https://github.com/Hasenpfote/fpq/blob/master/LICENSE>`__
+`Build Status <https://travis-ci.org/Hasenpfote/perfbench>`__ `PyPI
+version <https://badge.fury.io/py/perfbench>`__
 
 perfbench
 =========
@@ -23,6 +25,10 @@ Dependencies
 
 Installation
 ------------
+
+::
+
+   pip install perfbench
 
 Usage
 -----

@@ -1,4 +1,6 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Hasenpfote/fpq/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/Hasenpfote/perfbench.svg?branch=master)](https://travis-ci.org/Hasenpfote/perfbench)
+[![PyPI version](https://badge.fury.io/py/perfbench.svg)](https://badge.fury.io/py/perfbench)
 
 perfbench
 =========
@@ -16,6 +18,9 @@ perfbench works with Python 3.3 or higher.
 * plotly(2.7.0 or lower)
 
 ## Installation
+```
+pip install perfbench
+```
 
 ## Usage
 case1:
