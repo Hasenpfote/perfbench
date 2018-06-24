@@ -86,16 +86,57 @@ class Benchmark(object):
                               number=self.number,
                               repeat=self.repeat)
 
+    @property
+    def _colors(self):
+        return plotly.colors.DEFAULT_PLOTLY_COLORS
+
+    @classmethod
+    def _label_rgba(cls, colors):
+        return 'rgba({}, {}, {}, {})'.format(colors[0], colors[1], colors[2], colors[3])
+
+    @classmethod
+    def _make_filled_line(cls, x, y, delta, fillcolor):
+        x_rev = x[::-1]
+        y_upper = [a + b for a, b in zip(y, delta)]
+        y_lower = [a - b for a, b in zip(y, delta)]
+        y_lower = y_lower[::-1]
+        trace = plotly.graph_objs.Scatter(
+            x=x+x_rev,
+            y=y_upper+y_lower,
+            showlegend=False,
+            hoverinfo='none',
+            line=dict(color='rgba(255,255,255,0)'),
+            fill='tozerox',
+            fillcolor=fillcolor
+        )
+        return trace
+
     def _plot(self):
+        colors = self._colors
+        ncolors = len(colors)
+
         for result in self.results:
             data = []
             for index, item in enumerate(result):
+                averages = [tres.average for tres in item]
+                color = colors[index % ncolors]
                 trace = plotly.graph_objs.Scatter(
                     x=self.ntimes,
-                    y=[tres.average for tres in item],
+                    y=averages,
                     text=[tres.__str__() for tres in item],
                     hoverinfo='text',
-                    name=self.kernels[index].get('label', '')
+                    name=self.kernels[index].get('label', ''),
+                    line=dict(color=color)
+                )
+                data.append(trace)
+                #
+                stdevs = [tres.stdev for tres in item]
+                fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
+                trace = self._make_filled_line(
+                    x=self.ntimes,
+                    y=averages,
+                    delta=stdevs,
+                    fillcolor=fillcolor
                 )
                 data.append(trace)
 
@@ -116,6 +157,9 @@ class Benchmark(object):
         return plotly.graph_objs.Figure(data=data, layout=layout)
 
     def _multiplot(self):
+        colors = self._colors
+        ncolors = len(colors)
+
         fig = plotly.tools.make_subplots(
             rows=len(self.setups),
             cols=1,
@@ -123,18 +167,32 @@ class Benchmark(object):
             subplot_titles=[setup.get('title', '') for setup in self.setups]
         )
         for i, result in enumerate(self.results):
+            index = i + 1
             for j, item in enumerate(result):
                 name = self.setups[i].get('title', '') + ' - ' + self.kernels[j].get('label', '')
+                averages = [tres.average for tres in item]
+                color = colors[j % ncolors]
                 trace = plotly.graph_objs.Scatter(
                     x=self.ntimes,
-                    y=[tres.average for tres in item],
+                    y=averages,
                     text=[tres.__str__() for tres in item],
                     hoverinfo='text',
                     name=name,
-                    legendgroup=str(i)
+                    legendgroup=str(i),
+                    line=dict(color=color)
                 )
-                index = i + 1
                 fig.append_trace(trace, index, 1)
+                #
+                stdevs = [tres.stdev for tres in item]
+                fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
+                trace = self._make_filled_line(
+                    x=self.ntimes,
+                    y=averages,
+                    delta=stdevs,
+                    fillcolor=fillcolor
+                )
+                fig.append_trace(trace, index, 1)
+
                 xaxis = 'xaxis' + str(index)
                 yaxis = 'yaxis' + str(index)
                 fig['layout'][xaxis].update(title=self.xlabel, type=self.xaxis_type, autorange=True)
