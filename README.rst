@@ -55,7 +55,7 @@ Usage
    bm.run()
    bm.show()
 
-.. figure:: docs/plot1.png
+.. figure:: https://github.com/Hasenpfote/perfbench/tree/master/docs/plot1.png
    :alt: plot1
 
    plot1
@@ -90,7 +90,7 @@ Usage
    bm.run()
    bm.show()
 
-.. figure:: docs/plot2.png
+.. figure:: https://github.com/Hasenpfote/perfbench/tree/master/docs/plot2.png
    :alt: plot2
 
    plot2
