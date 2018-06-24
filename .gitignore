@@ -1,0 +1,5 @@
+/__pycache__
+/build
+/dist
+/perfbench.egg-info
+/temp
