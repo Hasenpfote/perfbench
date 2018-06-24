@@ -86,70 +86,66 @@ class Benchmark(object):
                               number=self.number,
                               repeat=self.repeat)
 
-    def _figure(self):
+    def _plot(self):
+        for result in self.results:
+            data = []
+            for index, item in enumerate(result):
+                trace = plotly.graph_objs.Scatter(
+                    x=self.ntimes,
+                    y=[tres.average for tres in item],
+                    text=[tres.__str__() for tres in item],
+                    hoverinfo='text',
+                    name=self.kernels[index].get('label', '')
+                )
+                data.append(trace)
 
-        if len(self.setups) > 1:
-            fig = plotly.tools.make_subplots(
-                rows=len(self.setups),
-                cols=1,
-                shared_xaxes=True,
-                subplot_titles=[setup.get('title', '') for setup in self.setups]
-            )
+        layout = plotly.graph_objs.Layout(
+            title=self.title,
+            xaxis={
+                'title': self.xlabel,
+                'type': self.xaxis_type,
+                'autorange': True,
+            },
+            yaxis={
+                'title': 'processing time',
+                'type': 'log',
+                'autorange': True,
+            }
+        )
 
-            for i, result in enumerate(self.results):
-                for j, item in enumerate(result):
-                    name = self.setups[i].get('title', '') + ' - ' + self.kernels[j].get('label', '')
-                    trace = plotly.graph_objs.Scatter(
-                        x=self.ntimes,
-                        y=[tres.average for tres in item],
-                        text=[tres.__str__() for tres in item],
-                        hoverinfo='text',
-                        name=name,
-                        legendgroup=str(i)
-                    )
-                    index = i + 1
-                    fig.append_trace(trace, index, 1)
-                    xaxis = 'xaxis' + str(index)
-                    yaxis = 'yaxis' + str(index)
-                    fig['layout'][xaxis].update(title=self.xlabel, type=self.xaxis_type, autorange=True)
-                    fig['layout'][yaxis].update(title='processing time', type='log', autorange=True)
+        return plotly.graph_objs.Figure(data=data, layout=layout)
 
-            fig['layout'].update(title=self.title)
+    def _multiplot(self):
+        fig = plotly.tools.make_subplots(
+            rows=len(self.setups),
+            cols=1,
+            shared_xaxes=True,
+            subplot_titles=[setup.get('title', '') for setup in self.setups]
+        )
+        for i, result in enumerate(self.results):
+            for j, item in enumerate(result):
+                name = self.setups[i].get('title', '') + ' - ' + self.kernels[j].get('label', '')
+                trace = plotly.graph_objs.Scatter(
+                    x=self.ntimes,
+                    y=[tres.average for tres in item],
+                    text=[tres.__str__() for tres in item],
+                    hoverinfo='text',
+                    name=name,
+                    legendgroup=str(i)
+                )
+                index = i + 1
+                fig.append_trace(trace, index, 1)
+                xaxis = 'xaxis' + str(index)
+                yaxis = 'yaxis' + str(index)
+                fig['layout'][xaxis].update(title=self.xlabel, type=self.xaxis_type, autorange=True)
+                fig['layout'][yaxis].update(title='processing time', type='log', autorange=True)
 
-            return fig
+        fig['layout'].update(title=self.title)
 
-        else:
-
-            for result in self.results:
-                data = []
-                for index, item in enumerate(result):
-                    trace = plotly.graph_objs.Scatter(
-                        x=self.ntimes,
-                        y=[tres.average for tres in item],
-                        text=[tres.__str__() for tres in item],
-                        hoverinfo='text',
-                        name=self.kernels[index].get('label', '')
-                    )
-                    data.append(trace)
-
-            layout = plotly.graph_objs.Layout(
-                title=self.title,
-                xaxis={
-                    'title': self.xlabel,
-                    'type': self.xaxis_type,
-                    'autorange': True,
-                },
-                yaxis={
-                    'title': 'processing time',
-                    'type': 'log',
-                    'autorange': True,
-                }
-            )
-
-            return plotly.graph_objs.Figure(data=data, layout=layout)
+        return fig
 
     def show(self):
-        fig = self._figure()
+        fig = self._multiplot() if len(self.setups) > 1 else self._plot()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
             plotly.offline.iplot(fig, show_link=False)
