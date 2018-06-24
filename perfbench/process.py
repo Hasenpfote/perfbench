@@ -65,7 +65,7 @@ class Benchmark(object):
                  ntimes,
                  number=0,
                  repeat=0,
-                 xlabel,
+                 xlabel=None,
                  title=None,
                  logx=False):
         self.setups = setups
@@ -73,7 +73,7 @@ class Benchmark(object):
         self.ntimes = ntimes
         self.number = number
         self.repeat = repeat
-        self.xlabel = xlabel
+        self.xlabel = '' if xlabel is None else xlabel
         self.title = '' if title is None else title
         self.xaxis_type = 'log' if logx else 'category'
         self.results = None
@@ -98,12 +98,14 @@ class Benchmark(object):
 
             for i, result in enumerate(self.results):
                 for j, item in enumerate(result):
+                    name = self.setups[i].get('title', '') + ' - ' + self.kernels[j].get('label', '')
                     trace = plotly.graph_objs.Scatter(
                         x=self.ntimes,
                         y=[tres.average for tres in item],
                         text=[tres.__str__() for tres in item],
                         hoverinfo='text',
-                        name=self.kernels[j].get('label', '')
+                        name=name,
+                        legendgroup=str(i)
                     )
                     index = i + 1
                     fig.append_trace(trace, index, 1)
@@ -111,6 +113,8 @@ class Benchmark(object):
                     yaxis = 'yaxis' + str(index)
                     fig['layout'][xaxis].update(title=self.xlabel, type=self.xaxis_type, autorange=True)
                     fig['layout'][yaxis].update(title='processing time', type='log', autorange=True)
+
+            fig['layout'].update(title=self.title)
 
             return fig
 
