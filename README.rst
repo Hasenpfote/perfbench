@@ -63,7 +63,7 @@ Usage
        logx=True
    )
    bm.run()
-   bm.show()
+   bm.plot()
 
 .. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png
    :alt: plot1
@@ -100,7 +100,7 @@ Usage
        logx=True
    )
    bm.run()
-   bm.show()
+   bm.plot()
 
 .. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png
    :alt: plot2

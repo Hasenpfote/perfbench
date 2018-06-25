@@ -50,7 +50,7 @@ bm = Benchmark(
     logx=True
 )
 bm.run()
-bm.show()
+bm.plot()
 ```
 ![plot1](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png)
 
@@ -83,7 +83,7 @@ bm = Benchmark(
     logx=True
 )
 bm.run()
-bm.show()
+bm.plot()
 ```
 ![plot2](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png)
 
