@@ -33,7 +33,7 @@ Installation
 Usage
 -----
 
-case1:
+**plotting a single figure.**
 
 .. code:: python
 
@@ -68,7 +68,7 @@ case1:
 
    plot1
 
-case2:
+**plotting multiple figures.**
 
 .. code:: python
 

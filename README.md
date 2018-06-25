@@ -23,7 +23,7 @@ pip install perfbench
 ```
 
 ## Usage
-case1:
+**plotting a single figure.**
 ```python
 import numpy as np
 from perfbench.process import *
@@ -54,7 +54,7 @@ bm.show()
 ![plot1](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png)
 
 
-case2:
+**plotting multiple figures.**
 ```python
 import numpy as np
 from perfbench.process import *
