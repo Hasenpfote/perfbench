@@ -118,7 +118,7 @@ class Benchmark(object):
             x=x+x_rev,
             y=y_upper+y_lower,
             showlegend=False,
-            hoverinfo='none',
+            hoverinfo='x',
             line=dict(color='rgba(255,255,255,0)'),
             fill='tozerox',
             fillcolor=fillcolor
@@ -138,7 +138,7 @@ class Benchmark(object):
                     x=self.ntimes,
                     y=averages,
                     text=[tres.__str__() for tres in item],
-                    hoverinfo='text',
+                    hoverinfo='x+text+name',
                     name=self.kernels[index].get('label', ''),
                     line=dict(color=color)
                 )
@@ -190,7 +190,7 @@ class Benchmark(object):
                     x=self.ntimes,
                     y=averages,
                     text=[tres.__str__() for tres in item],
-                    hoverinfo='text',
+                    hoverinfo='x+text+name',
                     name=name,
                     legendgroup=str(i),
                     line=dict(color=color)
