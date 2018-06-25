@@ -131,7 +131,11 @@ class Benchmark(object):
         )
         return trace
 
-    def _plot(self):
+    def _create_figure(self):
+        '''Create a figure.'''
+        if len(self._setups) > 1:
+            return self._create_figure_with_multiple_subplots()
+
         for result in self._results:
             data = []
             for index, item in enumerate(result):
@@ -173,7 +177,8 @@ class Benchmark(object):
 
         return plotly.graph_objs.Figure(data=data, layout=layout)
 
-    def _multiplot(self):
+    def _create_figure_with_multiple_subplots(self):
+        '''Create a figure with multiple subplots.'''
         fig = plotly.tools.make_subplots(
             rows=len(self._setups),
             cols=1,
@@ -230,9 +235,13 @@ class Benchmark(object):
         self.plot()
 
     def plot(self, *, auto_open=True):
-        fig = self._multiplot() if len(self._setups) > 1 else self._plot()
+        fig = self._create_figure()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
             plotly.offline.iplot(fig, show_link=False)
         else:
             plotly.offline.plot(fig, show_link=False, auto_open=auto_open)
+
+    def save_as_html(self, *, filepath='temp-plot.html'):
+        fig = self._create_figure()
+        plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
