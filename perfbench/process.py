@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import timeit
 import itertools
+import math
 import plotly
 from IPython.core.magics.execution import TimeitResult
 from . import utils
@@ -75,6 +76,7 @@ class Benchmark(object):
         self.repeat = repeat
         self.xlabel = '' if xlabel is None else xlabel
         self.title = '' if title is None else title
+        self.logx = logx
         self.xaxis_type = 'log' if logx else 'category'
         self.results = None
 
@@ -89,6 +91,18 @@ class Benchmark(object):
     @property
     def _colors(self):
         return plotly.colors.DEFAULT_PLOTLY_COLORS
+
+    @property
+    def _xaxis_type(self):
+        return 'log' if self.logx else '-'
+
+    @property
+    def _xaxis_range(self):
+        axis_range = [min(self.ntimes), max(self.ntimes)]
+        if self.logx:
+            axis_range[0] = math.log10(axis_range[0])
+            axis_range[1] = math.log10(axis_range[1])
+        return axis_range
 
     @classmethod
     def _label_rgba(cls, colors):
@@ -144,8 +158,8 @@ class Benchmark(object):
             title=self.title,
             xaxis={
                 'title': self.xlabel,
-                'type': self.xaxis_type,
-                'autorange': True,
+                'type': self._xaxis_type,
+                'range': self._xaxis_range,
             },
             yaxis={
                 'title': 'processing time',
@@ -195,8 +209,16 @@ class Benchmark(object):
 
                 xaxis = 'xaxis' + str(index)
                 yaxis = 'yaxis' + str(index)
-                fig['layout'][xaxis].update(title=self.xlabel, type=self.xaxis_type, autorange=True)
-                fig['layout'][yaxis].update(title='processing time', type='log', autorange=True)
+                fig['layout'][xaxis].update(
+                    title=self.xlabel,
+                    type=self._xaxis_type,
+                    range=self._xaxis_range
+                )
+                fig['layout'][yaxis].update(
+                    title='processing time',
+                    type='log',
+                    autorange=True
+                )
 
         fig['layout'].update(title=self.title)
 
