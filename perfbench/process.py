@@ -3,6 +3,7 @@
 import timeit
 import itertools
 import math
+import warnings
 import plotly
 from IPython.core.magics.execution import TimeitResult
 from . import utils
@@ -225,9 +226,14 @@ class Benchmark(object):
         return fig
 
     def show(self):
+        '''for backward compatibility.'''
+        warnings.warn('This function will be removed soon.')
+        self.plot()
+
+    def plot(self, *, auto_open=True):
         fig = self._multiplot() if len(self.setups) > 1 else self._plot()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
             plotly.offline.iplot(fig, show_link=False)
         else:
-            plotly.offline.plot(fig, show_link=False)
+            plotly.offline.plot(fig, show_link=False, auto_open=auto_open)

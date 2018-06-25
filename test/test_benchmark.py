@@ -115,7 +115,7 @@ class TestBenchmark(TestCase):
             logx=False
         )
         bm.run()
-        bm.show()
+        bm.plot(auto_open=False)
 
         bm = Benchmark(
             setups=[
@@ -131,7 +131,7 @@ class TestBenchmark(TestCase):
             logx=False
         )
         bm.run()
-        bm.show()
+        bm.plot(auto_open=False)
 
     def test_multiplot(self):
         bm = Benchmark(
@@ -149,7 +149,7 @@ class TestBenchmark(TestCase):
             logx=False
         )
         bm.run()
-        bm.show()
+        bm.plot(auto_open=False)
 
         bm = Benchmark(
             setups=[
@@ -166,4 +166,4 @@ class TestBenchmark(TestCase):
             logx=True
         )
         bm.run()
-        bm.show()
+        bm.plot(auto_open=False)
