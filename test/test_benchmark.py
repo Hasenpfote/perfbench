@@ -7,24 +7,6 @@ from perfbench.process import *
 
 
 class TestBenchmark(TestCase):
-    def test__colors(self):
-        bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            ntimes=[2 ** n for n in range(3)],
-            xlabel='samples',
-            title='test',
-            logx=False
-        )
-        actual = bm._colors
-        self.assertTrue(isinstance(actual, list))
-        self.assertTrue(len(actual) > 0)
-
     def test__xaxis_type(self):
         bm = Benchmark(
             setups=[
@@ -60,38 +42,21 @@ class TestBenchmark(TestCase):
         self.assertTrue(isinstance(actual, str))
         self.assertTrue(actual == 'log')
 
-    def test__xaxis_range(self):
-        bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            ntimes=[1, 10, 100],
-            xlabel='samples',
-            title='test',
-            logx=False
-        )
-        actual = bm._xaxis_range
+    def test__default_colors(self):
+        actual = Benchmark._default_colors()
+        self.assertTrue(isinstance(actual, list))
+        self.assertTrue(len(actual) > 0)
+
+    def test__color(self):
+        actual = Benchmark._color(index=0)
+        self.assertTrue(isinstance(actual, str))
+
+    def test__axis_range(self):
+        actual = Benchmark._axis_range(sequence=[1, 10, 100])
         self.assertTrue(isinstance(actual, list))
         self.assertTrue(actual == [1, 100])
 
-        bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            ntimes=[1, 10, 100],
-            xlabel='samples',
-            title='test',
-            logx=True
-        )
-        actual = bm._xaxis_range
+        actual = Benchmark._axis_range(sequence=[1, 10, 100], is_log_scale=True)
         self.assertTrue(isinstance(actual, list))
         self.assertTrue(actual == [0, 2])
 

@@ -7,26 +7,19 @@ from perfbench.process import *
 
 
 def main():
-    setups = [
-        {'func': lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), 'title': 'float64'}
-    ]
-
-    kernels = [
-        {'func': lambda x: np.around(x), 'label': 'around'},
-        {'func': lambda x: np.rint(x), 'label': 'rint'}
-    ]
-
-    ntimes = [2 ** n for n in range(15)]
-
     bm = Benchmark(
-        setups=setups,
-        kernels=kernels,
-        ntimes=ntimes,
+        setups=[
+            dict(func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), title='float64')
+        ],
+        kernels=[
+            dict(func=lambda x: np.around(x), label='around'),
+            dict(func=lambda x: np.rint(x), label='rint')
+        ],
+        ntimes=[2 ** n for n in range(3)],
         xlabel='samples',
-        title='test',
+        title='around vs rint',
         logx=True
     )
-
     bm.run()
     bm.show()
 

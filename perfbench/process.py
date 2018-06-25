@@ -24,7 +24,7 @@ def _determine_number(timer):
     number = 0
     for index in range(0, 10):
         number = 10 ** index
-        time_number = timer.timeit(number)
+        time_number = timer.timeit(number=number)
         if time_number >= 0.2:
             break
 
@@ -42,15 +42,15 @@ def _bench(setups, kernels, ntimes, number=0, repeat=0):
         res[i][j] = []
 
     for i, setup in enumerate(tqdm(setups)):
+        sfn = setup.get('func')
         for j, ntime in enumerate(tqdm(ntimes)):
-            sfn = setup.get('func')
             data = sfn(ntime)
             for k, kernel in enumerate(kernels):
                 kfn = kernel.get('func')
                 timer = timeit.Timer(stmt=lambda: kfn(data))
                 loops = number if number > 0 else _determine_number(timer)
 
-                all_runs = timer.repeat(repeat, loops)
+                all_runs = timer.repeat(repeat=repeat, number=loops)
                 best = min(all_runs) / loops
                 worst = max(all_runs) / loops
 
@@ -70,40 +70,45 @@ class Benchmark(object):
                  xlabel=None,
                  title=None,
                  logx=False):
-        self.setups = setups
-        self.kernels = kernels
-        self.ntimes = ntimes
-        self.number = number
-        self.repeat = repeat
-        self.xlabel = '' if xlabel is None else xlabel
-        self.title = '' if title is None else title
-        self.logx = logx
-        self.xaxis_type = 'log' if logx else 'category'
-        self.results = None
+        self._setups = setups
+        self._kernels = kernels
+        self._ntimes = ntimes
+        self._number = number
+        self._repeat = repeat
+        self._xlabel = '' if xlabel is None else xlabel
+        self._title = '' if title is None else title
+        self._logx = logx
+        self._results = None
 
     def run(self):
-
-        self.results = _bench(setups=self.setups,
-                              kernels=self.kernels,
-                              ntimes=self.ntimes,
-                              number=self.number,
-                              repeat=self.repeat)
-
-    @property
-    def _colors(self):
-        return plotly.colors.DEFAULT_PLOTLY_COLORS
+        self._results = _bench(
+            setups=self._setups,
+            kernels=self._kernels,
+            ntimes=self._ntimes,
+            number=self._number,
+            repeat=self._repeat
+        )
 
     @property
     def _xaxis_type(self):
-        return 'log' if self.logx else '-'
+        return 'log' if self._logx else '-'
 
-    @property
-    def _xaxis_range(self):
-        axis_range = [min(self.ntimes), max(self.ntimes)]
-        if self.logx:
-            axis_range[0] = math.log10(axis_range[0])
-            axis_range[1] = math.log10(axis_range[1])
-        return axis_range
+    @classmethod
+    def _default_colors(cls):
+        return plotly.colors.DEFAULT_PLOTLY_COLORS
+
+    @classmethod
+    def _color(cls, *, index):
+        colors = cls._default_colors()
+        return colors[index % len(colors)]
+
+    @classmethod
+    def _axis_range(cls, *, sequence, is_log_scale=False):
+        ar = [min(sequence), max(sequence)]
+        if is_log_scale:
+            ar[0] = math.log10(ar[0])
+            ar[1] = math.log10(ar[1])
+        return ar
 
     @classmethod
     def _label_rgba(cls, colors):
@@ -127,20 +132,17 @@ class Benchmark(object):
         return trace
 
     def _plot(self):
-        colors = self._colors
-        ncolors = len(colors)
-
-        for result in self.results:
+        for result in self._results:
             data = []
             for index, item in enumerate(result):
                 averages = [tres.average for tres in item]
-                color = colors[index % ncolors]
+                color = self._color(index=index)
                 trace = plotly.graph_objs.Scatter(
-                    x=self.ntimes,
+                    x=self._ntimes,
                     y=averages,
                     text=[tres.__str__() for tres in item],
                     hoverinfo='x+text+name',
-                    name=self.kernels[index].get('label', ''),
+                    name=self._kernels[index].get('label', ''),
                     line=dict(color=color)
                 )
                 data.append(trace)
@@ -148,7 +150,7 @@ class Benchmark(object):
                 stdevs = [tres.stdev for tres in item]
                 fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
                 trace = self._make_filled_line(
-                    x=self.ntimes,
+                    x=self._ntimes,
                     y=averages,
                     delta=stdevs,
                     fillcolor=fillcolor
@@ -156,39 +158,36 @@ class Benchmark(object):
                 data.append(trace)
 
         layout = plotly.graph_objs.Layout(
-            title=self.title,
-            xaxis={
-                'title': self.xlabel,
-                'type': self._xaxis_type,
-                'range': self._xaxis_range,
-            },
-            yaxis={
-                'title': 'processing time',
-                'type': 'log',
-                'autorange': True,
-            }
+            title=self._title,
+            xaxis=dict(
+                title=self._xlabel,
+                type=self._xaxis_type,
+                range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
+            ),
+            yaxis=dict(
+                title='processing time',
+                type='log',
+                autorange=True
+            )
         )
 
         return plotly.graph_objs.Figure(data=data, layout=layout)
 
     def _multiplot(self):
-        colors = self._colors
-        ncolors = len(colors)
-
         fig = plotly.tools.make_subplots(
-            rows=len(self.setups),
+            rows=len(self._setups),
             cols=1,
             shared_xaxes=True,
-            subplot_titles=[setup.get('title', '') for setup in self.setups]
+            subplot_titles=[setup.get('title', '') for setup in self._setups]
         )
-        for i, result in enumerate(self.results):
+        for i, result in enumerate(self._results):
             index = i + 1
             for j, item in enumerate(result):
-                name = self.setups[i].get('title', '') + ' - ' + self.kernels[j].get('label', '')
+                name = self._setups[i].get('title', '') + ' - ' + self._kernels[j].get('label', '')
                 averages = [tres.average for tres in item]
-                color = colors[j % ncolors]
+                color = self._color(index=j)
                 trace = plotly.graph_objs.Scatter(
-                    x=self.ntimes,
+                    x=self._ntimes,
                     y=averages,
                     text=[tres.__str__() for tres in item],
                     hoverinfo='x+text+name',
@@ -201,7 +200,7 @@ class Benchmark(object):
                 stdevs = [tres.stdev for tres in item]
                 fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
                 trace = self._make_filled_line(
-                    x=self.ntimes,
+                    x=self._ntimes,
                     y=averages,
                     delta=stdevs,
                     fillcolor=fillcolor
@@ -211,9 +210,9 @@ class Benchmark(object):
                 xaxis = 'xaxis' + str(index)
                 yaxis = 'yaxis' + str(index)
                 fig['layout'][xaxis].update(
-                    title=self.xlabel,
+                    title=self._xlabel,
                     type=self._xaxis_type,
-                    range=self._xaxis_range
+                    range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
                 )
                 fig['layout'][yaxis].update(
                     title='processing time',
@@ -221,7 +220,7 @@ class Benchmark(object):
                     autorange=True
                 )
 
-        fig['layout'].update(title=self.title)
+        fig['layout'].update(title=self._title)
 
         return fig
 
@@ -231,7 +230,7 @@ class Benchmark(object):
         self.plot()
 
     def plot(self, *, auto_open=True):
-        fig = self._multiplot() if len(self.setups) > 1 else self._plot()
+        fig = self._multiplot() if len(self._setups) > 1 else self._plot()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
             plotly.offline.iplot(fig, show_link=False)
