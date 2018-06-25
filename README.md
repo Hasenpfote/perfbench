@@ -6,6 +6,7 @@ perfbench
 =========
 
 ## About
+perfbench is a perfomance benchmarking module for Python code.
 
 ## Feature
 

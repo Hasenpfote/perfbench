@@ -37,7 +37,7 @@ if __name__ == '__main__':
     setup(
         name='perfbench',
         version=get_version(),
-        description='',
+        description='perfbench is a perfomance benchmarking module for Python code.',
         long_description=_long_description(),
         author='Hasenpfote',
         author_email='Hasenpfote36@gmail.com',
