@@ -15,14 +15,15 @@ def main():
             dict(func=lambda x: np.around(x), label='around'),
             dict(func=lambda x: np.rint(x), label='rint')
         ],
-        ntimes=[2 ** n for n in range(3)],
+        ntimes=[2 ** n for n in range(15)],
         xlabel='samples',
         title='around vs rint',
         logx=True
     )
     bm.run()
     bm.plot()
-    bm.save_as_png(filepath='test1.png')
+    bm.save_as_html(filepath='plot1.html')
+    bm.save_as_png(filepath='plot1.png')
 
 
 if __name__ == '__main__':
