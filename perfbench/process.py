@@ -258,7 +258,7 @@ class Benchmark(object):
         fig = self._create_figure()
         plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
 
-    def save_as_png(self, * filepath):
+    def save_as_png(self, *, filepath='plot_image.png'):
         if not utils.cmd_exists('orca'):
             warnings.warn('`orca` is not installed, this function can not be used.')
             return False

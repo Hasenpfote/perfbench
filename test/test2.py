@@ -24,7 +24,7 @@ def main():
     )
     bm.run()
     bm.plot()
-    bm.save_as_png('test2.png')
+    bm.save_as_png(filepath='test2.png')
 
 
 if __name__ == '__main__':
