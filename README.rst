@@ -13,6 +13,11 @@ perfbench is a perfomance benchmarking module for Python code.
 Feature
 -------
 
+-  The result of the benchmark can be saved locally as html.
+-  The result of the benchmark can be saved locally as png.
+   **Requires installation
+   of**\ `orca <https://github.com/plotly/orca>`__\ **.**
+
 Compatibility
 -------------
 
@@ -118,6 +123,20 @@ Usage
    :alt: plot2
 
    plot2
+
+**save as html.**
+
+.. code:: python
+
+   # same as above
+   bm.save_as_html(filepath='/path/to/file')
+
+**save as png.**
+
+.. code:: python
+
+   # same as above
+   bm.save_as_png(filepath='/path/to/file')
 
 License
 -------

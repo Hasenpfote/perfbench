@@ -9,6 +9,9 @@ perfbench
 perfbench is a perfomance benchmarking module for Python code.
 
 ## Feature
+* The result of the benchmark can be saved locally as html.
+* The result of the benchmark can be saved locally as png.  
+**Requires installation of [orca](https://github.com/plotly/orca).**
 
 ## Compatibility
 perfbench works with Python 3.3 or higher.
@@ -98,6 +101,18 @@ bm.run()
 bm.plot()
 ```
 ![plot2](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png)
+
+**save as html.**
+```python
+# same as above
+bm.save_as_html(filepath='/path/to/file')
+```
+
+**save as png.**
+```python
+# same as above
+bm.save_as_png(filepath='/path/to/file')
+```
 
 ## License
 This software is released under the MIT License, see LICENSE.
