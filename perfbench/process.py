@@ -3,6 +3,8 @@
 import timeit
 import itertools
 import math
+import subprocess
+import json
 import warnings
 import plotly
 from IPython.core.magics.execution import TimeitResult
@@ -245,3 +247,16 @@ class Benchmark(object):
     def save_as_html(self, *, filepath='temp-plot.html'):
         fig = self._create_figure()
         plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
+
+    def save_as_png(self, * filepath):
+        if not utils.cmd_exists('orca'):
+            warnings.warn('`orca` is not installed, this function can not be used.')
+            return False
+
+        fig = self._create_figure()
+        dumps = json.dumps(fig)
+        try:
+            subprocess.check_call(['orca', 'graph', dumps, '-o', filepath])
+            return True
+        except subprocess.CalledProcessError:
+            return False

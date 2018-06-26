@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import shutil
 from IPython import get_ipython
 
 
@@ -20,3 +21,6 @@ def create_empty_array_of_shape(shape):
     if shape:
         return [create_empty_array_of_shape(shape[1:]) for _ in range(shape[0])]
 
+
+def cmd_exists(cmd):
+    return shutil.which(cmd) is not None

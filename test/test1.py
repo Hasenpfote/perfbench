@@ -21,7 +21,8 @@ def main():
         logx=True
     )
     bm.run()
-    bm.show()
+    bm.plot()
+    bm.save_as_png('test1.png')
 
 
 if __name__ == '__main__':
