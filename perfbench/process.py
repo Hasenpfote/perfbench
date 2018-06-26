@@ -113,11 +113,11 @@ class Benchmark(object):
         return ar
 
     @classmethod
-    def _label_rgba(cls, colors):
+    def _label_rgba(cls, *, colors):
         return 'rgba({}, {}, {}, {})'.format(colors[0], colors[1], colors[2], colors[3])
 
     @classmethod
-    def _make_filled_line(cls, x, y, delta, fillcolor):
+    def _make_filled_line(cls, *, x, y, delta, legendgroup, fillcolor):
         x_rev = x[::-1]
         y_upper = [a + b for a, b in zip(y, delta)]
         y_lower = [a - b for a, b in zip(y, delta)]
@@ -125,8 +125,9 @@ class Benchmark(object):
         trace = plotly.graph_objs.Scatter(
             x=x+x_rev,
             y=y_upper+y_lower,
-            showlegend=False,
             hoverinfo='x',
+            showlegend=False,
+            legendgroup=legendgroup,
             line=dict(color='rgba(255,255,255,0)'),
             fill='tozerox',
             fillcolor=fillcolor
@@ -141,24 +142,29 @@ class Benchmark(object):
         for result in self._results:
             data = []
             for index, item in enumerate(result):
-                averages = [tres.average for tres in item]
+                x = self._ntimes
+                y = [tres.average for tres in item]
+                legendgroup = str(index)
+
                 color = self._color(index=index)
                 trace = plotly.graph_objs.Scatter(
-                    x=self._ntimes,
-                    y=averages,
+                    x=x,
+                    y=y,
+                    name=self._kernels[index].get('label', ''),
                     text=[tres.__str__() for tres in item],
                     hoverinfo='x+text+name',
-                    name=self._kernels[index].get('label', ''),
-                    line=dict(color=color)
+                    showlegend=True,
+                    legendgroup=legendgroup,
+                    line=dict(color=color),
                 )
                 data.append(trace)
-                #
-                stdevs = [tres.stdev for tres in item]
-                fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
+
+                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.2,))
                 trace = self._make_filled_line(
-                    x=self._ntimes,
-                    y=averages,
-                    delta=stdevs,
+                    x=x,
+                    y=y,
+                    delta=[tres.stdev for tres in item],
+                    legendgroup=legendgroup,
                     fillcolor=fillcolor
                 )
                 data.append(trace)
@@ -168,7 +174,7 @@ class Benchmark(object):
             xaxis=dict(
                 title=self._xlabel,
                 type=self._xaxis_type,
-                range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
+                range=self._axis_range(sequence=x, is_log_scale=self._logx)
             ),
             yaxis=dict(
                 title='processing time',
@@ -189,27 +195,31 @@ class Benchmark(object):
         )
         for i, result in enumerate(self._results):
             index = i + 1
+            showlegend = True if i == 0 else False
             for j, item in enumerate(result):
-                name = self._setups[i].get('title', '') + ' - ' + self._kernels[j].get('label', '')
-                averages = [tres.average for tres in item]
+                x = self._ntimes
+                y = [tres.average for tres in item]
+                legendgroup = str(j)
+
                 color = self._color(index=j)
                 trace = plotly.graph_objs.Scatter(
-                    x=self._ntimes,
-                    y=averages,
+                    x=x,
+                    y=y,
+                    name=self._kernels[j].get('label', ''),
                     text=[tres.__str__() for tres in item],
                     hoverinfo='x+text+name',
-                    name=name,
-                    legendgroup=str(i),
+                    showlegend=showlegend,
+                    legendgroup=legendgroup,
                     line=dict(color=color)
                 )
                 fig.append_trace(trace, index, 1)
-                #
-                stdevs = [tres.stdev for tres in item]
-                fillcolor = self._label_rgba(plotly.colors.unlabel_rgb(color) + (0.2,))
+
+                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.2,))
                 trace = self._make_filled_line(
-                    x=self._ntimes,
-                    y=averages,
-                    delta=stdevs,
+                    x=x,
+                    y=y,
+                    delta=[tres.stdev for tres in item],
+                    legendgroup=legendgroup,
                     fillcolor=fillcolor
                 )
                 fig.append_trace(trace, index, 1)
@@ -219,7 +229,7 @@ class Benchmark(object):
                 fig['layout'][xaxis].update(
                     title=self._xlabel,
                     type=self._xaxis_type,
-                    range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
+                    range=self._axis_range(sequence=x, is_log_scale=self._logx)
                 )
                 fig['layout'][yaxis].update(
                     title='processing time',

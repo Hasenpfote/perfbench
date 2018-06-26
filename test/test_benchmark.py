@@ -61,7 +61,7 @@ class TestBenchmark(TestCase):
         self.assertTrue(actual == [0, 2])
 
     def test__label_rgba(self):
-        actual = Benchmark._label_rgba((32, 64, 128, 0.5))
+        actual = Benchmark._label_rgba(colors=(32, 64, 128, 0.5))
         self.assertTrue(isinstance(actual, str))
         self.assertTrue(actual == 'rgba(32, 64, 128, 0.5)')
 
