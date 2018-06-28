@@ -104,95 +104,36 @@ class Benchmark(object):
         colors = cls._default_colors()
         return colors[index % len(colors)]
 
-    @classmethod
-    def _axis_range(cls, *, sequence, is_log_scale=False):
+    @staticmethod
+    def _axis_range(sequence, is_log_scale=False):
         ar = [min(sequence), max(sequence)]
         if is_log_scale:
             ar[0] = math.log10(ar[0])
             ar[1] = math.log10(ar[1])
         return ar
 
-    @classmethod
-    def _label_rgba(cls, *, colors):
+    @staticmethod
+    def _label_rgba(colors):
         return 'rgba({}, {}, {}, {})'.format(colors[0], colors[1], colors[2], colors[3])
 
-    @classmethod
-    def _make_filled_line(cls, *, x, y, delta, legendgroup, fillcolor):
+    @staticmethod
+    def _calc_filled_line(x, y, delta):
         x_rev = x[::-1]
         y_upper = [a + b for a, b in zip(y, delta)]
         y_lower = [a - b for a, b in zip(y, delta)]
         y_lower = y_lower[::-1]
-        trace = plotly.graph_objs.Scatter(
-            x=x+x_rev,
-            y=y_upper+y_lower,
-            hoverinfo='x',
-            showlegend=False,
-            legendgroup=legendgroup,
-            line=dict(color='rgba(255,255,255,0)'),
-            fill='tozerox',
-            fillcolor=fillcolor
-        )
-        return trace
+        return x+x_rev, y_upper+y_lower
 
     def _create_figure(self):
-        '''Create a figure.'''
-        if len(self._setups) > 1:
-            return self._create_figure_with_multiple_subplots()
-
-        for result in self._results:
-            data = []
-            for index, item in enumerate(result):
-                x = self._ntimes
-                y = [tres.average for tres in item]
-                legendgroup = str(index)
-
-                color = self._color(index=index)
-                trace = plotly.graph_objs.Scatter(
-                    x=x,
-                    y=y,
-                    name=self._kernels[index].get('label', ''),
-                    text=[tres.__str__() for tres in item],
-                    hoverinfo='x+text+name',
-                    showlegend=True,
-                    legendgroup=legendgroup,
-                    line=dict(color=color),
-                )
-                data.append(trace)
-
-                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.2,))
-                trace = self._make_filled_line(
-                    x=x,
-                    y=y,
-                    delta=[tres.stdev for tres in item],
-                    legendgroup=legendgroup,
-                    fillcolor=fillcolor
-                )
-                data.append(trace)
-
-        layout = plotly.graph_objs.Layout(
-            title=self._title,
-            xaxis=dict(
-                title=self._xlabel,
-                type=self._xaxis_type,
-                range=self._axis_range(sequence=x, is_log_scale=self._logx)
-            ),
-            yaxis=dict(
-                title='processing time',
-                type='log',
-                autorange=True
-            )
-        )
-
-        return plotly.graph_objs.Figure(data=data, layout=layout)
-
-    def _create_figure_with_multiple_subplots(self):
         '''Create a figure with multiple subplots.'''
         fig = plotly.tools.make_subplots(
             rows=len(self._setups),
             cols=1,
             shared_xaxes=True,
-            subplot_titles=[setup.get('title', '') for setup in self._setups]
+            subplot_titles=[setup.get('title', '') for setup in self._setups],
+            print_grid=False
         )
+
         for i, result in enumerate(self._results):
             index = i + 1
             showlegend = True if i == 0 else False
@@ -200,7 +141,7 @@ class Benchmark(object):
                 x = self._ntimes
                 y = [tres.average for tres in item]
                 legendgroup = str(j)
-
+                # average
                 color = self._color(index=j)
                 trace = plotly.graph_objs.Scatter(
                     x=x,
@@ -213,13 +154,17 @@ class Benchmark(object):
                     line=dict(color=color)
                 )
                 fig.append_trace(trace, index, 1)
-
-                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.2,))
-                trace = self._make_filled_line(
-                    x=x,
-                    y=y,
-                    delta=[tres.stdev for tres in item],
+                # stdev
+                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.1,))
+                fx, fy = self._calc_filled_line(x=x, y=y, delta=[tres.stdev for tres in item])
+                trace = plotly.graph_objs.Scatter(
+                    x=fx,
+                    y=fy,
+                    hoverinfo='x',
+                    showlegend=False,
                     legendgroup=legendgroup,
+                    line=dict(color='rgba(255,255,255,0)'),
+                    fill='tozerox',
                     fillcolor=fillcolor
                 )
                 fig.append_trace(trace, index, 1)
