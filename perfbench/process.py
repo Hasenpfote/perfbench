@@ -134,6 +134,8 @@ class Benchmark(object):
             print_grid=False
         )
 
+        data_types = []
+
         for i, result in enumerate(self._results):
             index = i + 1
             showlegend = True if i == 0 else False
@@ -154,6 +156,7 @@ class Benchmark(object):
                     line=dict(color=color)
                 )
                 fig.append_trace(trace, index, 1)
+                data_types.append('average')
                 # stdev
                 fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.1,))
                 fx, fy = self._calc_filled_line(x=x, y=y, delta=[tres.stdev for tres in item])
@@ -168,6 +171,7 @@ class Benchmark(object):
                     fillcolor=fillcolor
                 )
                 fig.append_trace(trace, index, 1)
+                data_types.append('stdev')
 
                 xaxis = 'xaxis' + str(index)
                 yaxis = 'yaxis' + str(index)
@@ -182,7 +186,25 @@ class Benchmark(object):
                     autorange=True
                 )
 
-        fig['layout'].update(title=self._title)
+        updatemenus = list([
+            dict(
+                active=0,
+                buttons=list([
+                    dict(
+                        label='Stdev - On',
+                        method='update',
+                        args=[dict(visible=[True for _ in data_types])]
+                    ),
+                    dict(
+                        label='Stdev - Off',
+                        method='update',
+                        args=[dict(visible=[True if type == 'average' else False for type in data_types])]
+                    )
+                ])
+            )
+        ])
+
+        fig['layout'].update(title=self._title, updatemenus=updatemenus)
 
         return fig
 
