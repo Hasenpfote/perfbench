@@ -17,9 +17,9 @@ perfbench is a perfomance benchmarking module for Python code.
 perfbench works with Python 3.3 or higher.
 
 ## Dependencies
-* ipython(6.0.0 or higher.)
-* tqdm(4.6.1 or higher.)
-* plotly(2.7.0 or lower)
+* [ipython](https://github.com/ipython/ipython)(6.0.0 or higher.)
+* [tqdm](https://github.com/tqdm/tqdm)(4.6.1 or higher.)
+* [plotly](https://github.com/plotly/plotly.py)(2.7.0 or lower)
 
 ## Installation
 ```
