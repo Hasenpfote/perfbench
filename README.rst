@@ -40,7 +40,9 @@ Installation
 Usage
 -----
 
-**plotting a single figure.**
+| **plotting a single figure.**
+| `Here <https://plot.ly/~Hasenpfote/7/perfbench-demo1/>`__ is a
+  demonstration.
 
 .. code:: python
 
@@ -78,7 +80,9 @@ Usage
 
    plot1
 
-**plotting multiple figures.**
+| **plotting multiple figures.**
+| `Here <https://plot.ly/~Hasenpfote/6/perfbench-demo2/>`__ is a
+  demonstration.
 
 .. code:: python
 
