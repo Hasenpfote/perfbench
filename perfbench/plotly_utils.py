@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import math
 import re
 import itertools
+
+
+try:
+    from math import gcd
+except ImportError:
+    # for backward compatibility.
+    def _gcd(a, b):
+        '''Greatest Common Divisor.'''
+        while b:
+            a, b = b, a % b
+        return a
+
+    gcd = _gcd
 
 
 def _glab_keys(d, pattern):
@@ -38,9 +50,9 @@ def _find_axes_combs(fig):
         xaxes = xaxes * n_yaxes
         yaxes = yaxes * n_xaxes
     else:
-        gcd = math.gcd(n_xaxes, n_yaxes)
-        xaxes = xaxes * (n_yaxes // gcd)
-        yaxes = yaxes * (n_xaxes // gcd)
+        coef = gcd(n_xaxes, n_yaxes)
+        xaxes = xaxes * (n_yaxes // coef)
+        yaxes = yaxes * (n_xaxes // coef)
 
     if is_shared_yaxes:
         yaxes.sort()
