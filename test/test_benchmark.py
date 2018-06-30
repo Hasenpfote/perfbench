@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from unittest import TestCase
+import os
 import sys
 sys.path.append('../')
 from perfbench.process import *
@@ -84,6 +85,24 @@ class TestBenchmark(TestCase):
 
         bm = Benchmark(
             setups=[
+                dict(func=lambda n: [int(i) for i in range(n)], title='int'),
+                dict(func=lambda n: [float(i) for i in range(n)], title='float')
+            ],
+            kernels=[
+                dict(func=lambda x: [value + 2 for value in x], label='add'),
+                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            ],
+            ntimes=[2 ** n for n in range(2)],
+            xlabel='samples',
+            title='test',
+            logx=False
+        )
+        bm.run()
+        bm.plot(auto_open=False)
+
+    def test_save_as_html(self):
+        bm = Benchmark(
+            setups=[
                 dict(func=lambda n: [i for i in range(n)], title='')
             ],
             kernels=[
@@ -96,13 +115,13 @@ class TestBenchmark(TestCase):
             logx=False
         )
         bm.run()
-        bm.plot(auto_open=False)
+        bm.save_as_html(filepath='test.html')
+        self.assertTrue(os.path.exists('./test.html'))
 
-    def test_multiplot(self):
+    def test_save_as_png(self):
         bm = Benchmark(
             setups=[
-                dict(func=lambda n: [int(i) for i in range(n)], title='int'),
-                dict(func=lambda n: [float(i) for i in range(n)], title='float')
+                dict(func=lambda n: [i for i in range(n)], title='')
             ],
             kernels=[
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
@@ -114,21 +133,6 @@ class TestBenchmark(TestCase):
             logx=False
         )
         bm.run()
-        bm.plot(auto_open=False)
-
-        bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [int(i) for i in range(n)], title='int'),
-                dict(func=lambda n: [float(i) for i in range(n)], title='float')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            ntimes=[2 ** n for n in range(2)],
-            xlabel='samples',
-            title='test',
-            logx=True
-        )
-        bm.run()
-        bm.plot(auto_open=False)
+        ret = bm.save_as_png(filepath='test.png')
+        self.assertTrue(ret)
+        #self.assertTrue(os.path.exists('./test.png'))
