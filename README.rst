@@ -124,6 +124,11 @@ Usage
 
    plot2
 
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2_2.png
+   :alt: plot2
+
+   plot2
+
 **save as html.**
 
 .. code:: python

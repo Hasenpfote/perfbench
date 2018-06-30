@@ -102,6 +102,8 @@ bm.plot()
 ```
 ![plot2](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png)
 
+![plot2](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2_2.png)
+
 **save as html.**
 ```python
 # same as above
