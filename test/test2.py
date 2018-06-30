@@ -15,7 +15,7 @@ def main():
         ],
         kernels=[
             dict(func=lambda x: np.around(x), label='around'),
-            dict(func=lambda x: np.rint(x), label='rint')
+            dict(func=lambda x: np.rint(x), label='rint'),
         ],
         ntimes=[2 ** n for n in range(15)],
         xlabel='samples',

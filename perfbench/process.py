@@ -9,6 +9,7 @@ import warnings
 import plotly
 from IPython.core.magics.execution import TimeitResult
 from . import utils
+from . import plotly_utils
 
 
 try:
@@ -38,7 +39,7 @@ def _bench(setups, kernels, ntimes, number=0, repeat=0):
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
 
-    shape = (len(setups), len(kernels))
+    shape = (len(kernels), len(setups))
     res = utils.create_empty_array_of_shape(shape)
     for i, j in itertools.product(range(shape[0]), range(shape[1])):
         res[i][j] = []
@@ -56,7 +57,7 @@ def _bench(setups, kernels, ntimes, number=0, repeat=0):
                 best = min(all_runs) / loops
                 worst = max(all_runs) / loops
 
-                res[i][k].append(TimeitResult(loops, repeat, best, worst, all_runs, 0, 3))
+                res[k][i].append(TimeitResult(loops, repeat, best, worst, all_runs, 0, 3))
 
     return res
 
@@ -126,38 +127,51 @@ class Benchmark(object):
 
     def _create_figure(self):
         '''Create a figure with multiple subplots.'''
+        nsetups = len(self._setups)
         fig = plotly.tools.make_subplots(
-            rows=len(self._setups),
+            rows=nsetups,
             cols=1,
             shared_xaxes=True,
             subplot_titles=[setup.get('title', '') for setup in self._setups],
             print_grid=False
         )
 
-        data_types = []
-
+        # for averages.
         for i, result in enumerate(self._results):
-            index = i + 1
-            showlegend = True if i == 0 else False
+            legendgroup = str(i)
+            name = self._kernels[i].get('label', '')
+            color = self._color(index=i)
             for j, item in enumerate(result):
+                index = j + 1
                 x = self._ntimes
                 y = [tres.average for tres in item]
-                legendgroup = str(j)
-                # average
-                color = self._color(index=j)
+
+                if nsetups > 1:
+                    title = self._setups[j].get('title', '')
+                    suffix = ' - ' + title if title else ''
+                else:
+                    suffix = ''
+
                 trace = plotly.graph_objs.Scatter(
                     x=x,
                     y=y,
-                    name=self._kernels[j].get('label', ''),
+                    name=name + suffix,
                     text=[tres.__str__() for tres in item],
                     hoverinfo='x+text+name',
-                    showlegend=showlegend,
+                    showlegend=True,
                     legendgroup=legendgroup,
                     line=dict(color=color)
                 )
                 fig.append_trace(trace, index, 1)
-                data_types.append('average')
-                # stdev
+
+        # for standard deviations.
+        for i, result in enumerate(self._results):
+            legendgroup = str(i)
+            color = self._color(index=i)
+            for j, item in enumerate(result):
+                index = j + 1
+                x = self._ntimes
+                y = [tres.average for tres in item]
                 fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.1,))
                 fx, fy = self._calc_filled_line(x=x, y=y, delta=[tres.stdev for tres in item])
                 trace = plotly.graph_objs.Scatter(
@@ -171,38 +185,36 @@ class Benchmark(object):
                     fillcolor=fillcolor
                 )
                 fig.append_trace(trace, index, 1)
-                data_types.append('stdev')
 
-                xaxis = 'xaxis' + str(index)
-                yaxis = 'yaxis' + str(index)
-                fig['layout'][xaxis].update(
-                    title=self._xlabel,
-                    type=self._xaxis_type,
-                    range=self._axis_range(sequence=x, is_log_scale=self._logx)
-                )
-                fig['layout'][yaxis].update(
-                    title='processing time',
-                    type='log',
-                    autorange=True
-                )
-
-        updatemenus = list([
-            dict(
-                active=0,
-                buttons=list([
-                    dict(
-                        label='Stdev - On',
-                        method='update',
-                        args=[dict(visible=[True for _ in data_types])]
-                    ),
-                    dict(
-                        label='Stdev - Off',
-                        method='update',
-                        args=[dict(visible=[True if type == 'average' else False for type in data_types])]
-                    )
-                ])
+        # update the layout.
+        fig['layout']['xaxis1'].update(
+            title=self._xlabel,
+            type=self._xaxis_type,
+            range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
+        )
+        for i, _ in enumerate(self._setups):
+            yaxis = 'yaxis' + str(i + 1)
+            fig['layout'][yaxis].update(
+                title='processing time',
+                type='log',
+                autorange=True
             )
-        ])
+
+        if nsetups > 1:
+            updatemenus = list([
+                dict(
+                    active=0,
+                    buttons=plotly_utils.make_subplot_buttons(fig),
+                    direction='down',
+                    showactive=True,
+                    x=0.0,
+                    xanchor='left',
+                    y=1.2,
+                    yanchor='top'
+                )
+            ])
+        else:
+            updatemenus = []
 
         fig['layout'].update(title=self._title, updatemenus=updatemenus)
 
