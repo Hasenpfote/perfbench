@@ -57,7 +57,7 @@ class TestBenchmark(TestCase):
         self.assertTrue(isinstance(actual, list))
         self.assertTrue(actual == [1, 100])
 
-        actual = Benchmark._axis_range(sequence=[1, 10, 100], is_log_scale=True)
+        actual = Benchmark._axis_range(sequence=[1, 10, 100], use_log_scale=True)
         self.assertTrue(isinstance(actual, list))
         self.assertTrue(actual == [0, 2])
 
@@ -80,7 +80,7 @@ class TestBenchmark(TestCase):
             title='test',
             logx=False
         )
-        bm.run()
+        bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
 
         bm = Benchmark(
@@ -97,7 +97,7 @@ class TestBenchmark(TestCase):
             title='test',
             logx=False
         )
-        bm.run()
+        bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
 
     def test_save_as_html(self):
@@ -114,7 +114,7 @@ class TestBenchmark(TestCase):
             title='test',
             logx=False
         )
-        bm.run()
+        bm.run(disable_tqdm=True)
         bm.save_as_html(filepath='test.html')
         self.assertTrue(os.path.exists('./test.html'))
 
@@ -132,7 +132,7 @@ class TestBenchmark(TestCase):
             title='test',
             logx=False
         )
-        bm.run()
+        bm.run(disable_tqdm=True)
         ret = bm.save_as_png(filepath='test.png')
         self.assertTrue(ret)
         #self.assertTrue(os.path.exists('./test.png'))

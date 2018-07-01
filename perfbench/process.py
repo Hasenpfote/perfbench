@@ -34,7 +34,7 @@ def _determine_number(timer):
     return number
 
 
-def _bench(setups, kernels, ntimes, number=0, repeat=0):
+def _bench(setups, kernels, ntimes, number=0, repeat=0, disable_tqdm=False):
     if repeat == 0:
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
@@ -44,9 +44,9 @@ def _bench(setups, kernels, ntimes, number=0, repeat=0):
     for i, j in itertools.product(range(shape[0]), range(shape[1])):
         res[i][j] = []
 
-    for i, setup in enumerate(tqdm(setups)):
+    for i, setup in enumerate(tqdm(setups, disable=disable_tqdm)):
         sfn = setup.get('func')
-        for j, ntime in enumerate(tqdm(ntimes)):
+        for j, ntime in enumerate(tqdm(ntimes, disable=disable_tqdm)):
             data = sfn(ntime)
             for k, kernel in enumerate(kernels):
                 kfn = kernel.get('func')
@@ -83,13 +83,14 @@ class Benchmark(object):
         self._logx = logx
         self._results = None
 
-    def run(self):
+    def run(self, disable_tqdm=False):
         self._results = _bench(
             setups=self._setups,
             kernels=self._kernels,
             ntimes=self._ntimes,
             number=self._number,
-            repeat=self._repeat
+            repeat=self._repeat,
+            disable_tqdm=disable_tqdm
         )
 
     @property
@@ -106,9 +107,9 @@ class Benchmark(object):
         return colors[index % len(colors)]
 
     @staticmethod
-    def _axis_range(sequence, is_log_scale=False):
+    def _axis_range(sequence, use_log_scale=False):
         ar = [min(sequence), max(sequence)]
-        if is_log_scale:
+        if use_log_scale:
             ar[0] = math.log10(ar[0])
             ar[1] = math.log10(ar[1])
         return ar
@@ -190,7 +191,7 @@ class Benchmark(object):
         fig['layout']['xaxis1'].update(
             title=self._xlabel,
             type=self._xaxis_type,
-            range=self._axis_range(sequence=self._ntimes, is_log_scale=self._logx)
+            range=self._axis_range(sequence=self._ntimes, use_log_scale=self._logx)
         )
         for i, _ in enumerate(self._setups):
             yaxis = 'yaxis' + str(i + 1)
