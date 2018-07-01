@@ -34,7 +34,7 @@ def _determine_number(timer):
     return number
 
 
-def _bench(setups, kernels, ntimes, number=0, repeat=0, disable_tqdm=False):
+def _bench(setups, kernels, dataset_sizes, number=0, repeat=0, disable_tqdm=False):
     if repeat == 0:
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
@@ -46,7 +46,7 @@ def _bench(setups, kernels, ntimes, number=0, repeat=0, disable_tqdm=False):
 
     for i, setup in enumerate(tqdm(setups, disable=disable_tqdm)):
         sfn = setup.get('func')
-        for j, ntime in enumerate(tqdm(ntimes, disable=disable_tqdm)):
+        for j, ntime in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
             data = sfn(ntime)
             for k, kernel in enumerate(kernels):
                 kfn = kernel.get('func')
@@ -67,7 +67,8 @@ class Benchmark(object):
     def __init__(self, *,
                  setups,
                  kernels,
-                 ntimes,
+                 dataset_sizes=None,
+                 ntimes=None,
                  number=0,
                  repeat=0,
                  xlabel=None,
@@ -75,7 +76,10 @@ class Benchmark(object):
                  logx=False):
         self._setups = setups
         self._kernels = kernels
-        self._ntimes = ntimes
+        self._dataset_sizes = dataset_sizes
+        if ntimes is not None:
+            warnings.warn('`ntimes` is deprecated. Use `dataset_sizes`.')
+            self._dataset_sizes = ntimes
         self._number = number
         self._repeat = repeat
         self._xlabel = '' if xlabel is None else xlabel
@@ -87,7 +91,7 @@ class Benchmark(object):
         self._results = _bench(
             setups=self._setups,
             kernels=self._kernels,
-            ntimes=self._ntimes,
+            dataset_sizes=self._dataset_sizes,
             number=self._number,
             repeat=self._repeat,
             disable_tqdm=disable_tqdm
@@ -144,7 +148,7 @@ class Benchmark(object):
             color = self._color(index=i)
             for j, item in enumerate(result):
                 index = j + 1
-                x = self._ntimes
+                x = self._dataset_sizes
                 y = [tres.average for tres in item]
 
                 if nsetups > 1:
@@ -171,7 +175,7 @@ class Benchmark(object):
             color = self._color(index=i)
             for j, item in enumerate(result):
                 index = j + 1
-                x = self._ntimes
+                x = self._dataset_sizes
                 y = [tres.average for tres in item]
                 fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.1,))
                 fx, fy = self._calc_filled_line(x=x, y=y, delta=[tres.stdev for tres in item])
@@ -191,7 +195,7 @@ class Benchmark(object):
         fig['layout']['xaxis1'].update(
             title=self._xlabel,
             type=self._xaxis_type,
-            range=self._axis_range(sequence=self._ntimes, use_log_scale=self._logx)
+            range=self._axis_range(sequence=self._dataset_sizes, use_log_scale=self._logx)
         )
         for i, _ in enumerate(self._setups):
             yaxis = 'yaxis' + str(i + 1)

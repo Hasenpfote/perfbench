@@ -17,7 +17,7 @@ def main():
             dict(func=lambda x: np.around(x), label='around'),
             dict(func=lambda x: np.rint(x), label='rint'),
         ],
-        ntimes=[2 ** n for n in range(15)],
+        dataset_sizes=[2 ** n for n in range(15)],
         xlabel='samples',
         title='around vs rint',
         logx=True

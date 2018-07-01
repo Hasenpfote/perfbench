@@ -67,7 +67,7 @@ Usage
                label='rint'
            )
        ],
-       ntimes=[2 ** n for n in range(26)],
+       dataset_sizes=[2 ** n for n in range(26)],
        xlabel='samples',
        title='around vs rint',
        logx=True
@@ -115,7 +115,7 @@ Usage
                label='rint'
            )
        ],
-       ntimes=[2 ** n for n in range(26)],
+       dataset_sizes=[2 ** n for n in range(26)],
        xlabel='samples',
        title='around vs rint',
        logx=True

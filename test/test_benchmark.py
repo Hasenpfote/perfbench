@@ -17,7 +17,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(3)],
+            dataset_sizes=[2 ** n for n in range(3)],
             xlabel='samples',
             title='test',
             logx=False
@@ -34,7 +34,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(3)],
+            dataset_sizes=[2 ** n for n in range(3)],
             xlabel='samples',
             title='test',
             logx=True
@@ -75,7 +75,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(2)],
+            dataset_sizes=[2 ** n for n in range(2)],
             xlabel='samples',
             title='test',
             logx=False
@@ -92,7 +92,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(2)],
+            dataset_sizes=[2 ** n for n in range(2)],
             xlabel='samples',
             title='test',
             logx=False
@@ -109,7 +109,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(2)],
+            dataset_sizes=[2 ** n for n in range(2)],
             xlabel='samples',
             title='test',
             logx=False
@@ -127,7 +127,7 @@ class TestBenchmark(TestCase):
                 dict(func=lambda x: [value + 2 for value in x], label='add'),
                 dict(func=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            ntimes=[2 ** n for n in range(2)],
+            dataset_sizes=[2 ** n for n in range(2)],
             xlabel='samples',
             title='test',
             logx=False
