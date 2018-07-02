@@ -10,14 +10,14 @@ from perfbench.process import *
 class TestBenchmark(TestCase):
     def test__xaxis_type(self):
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
             ],
             dataset_sizes=[2 ** n for n in range(3)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=False
@@ -27,14 +27,14 @@ class TestBenchmark(TestCase):
         self.assertTrue(actual == '-')
 
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
             ],
             dataset_sizes=[2 ** n for n in range(3)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=True
@@ -68,14 +68,14 @@ class TestBenchmark(TestCase):
 
     def test_plot(self):
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
             ],
             dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=False
@@ -84,15 +84,15 @@ class TestBenchmark(TestCase):
         bm.plot(auto_open=False)
 
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [int(i) for i in range(n)], title='int'),
-                dict(func=lambda n: [float(i) for i in range(n)], title='float')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [int(i) for i in range(n)], title='int'),
+                dict(stmt=lambda n: [float(i) for i in range(n)], title='float')
             ],
             dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=False
@@ -102,14 +102,14 @@ class TestBenchmark(TestCase):
 
     def test_save_as_html(self):
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
             ],
             dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=False
@@ -120,14 +120,14 @@ class TestBenchmark(TestCase):
 
     def test_save_as_png(self):
         bm = Benchmark(
-            setups=[
-                dict(func=lambda n: [i for i in range(n)], title='')
-            ],
-            kernels=[
-                dict(func=lambda x: [value + 2 for value in x], label='add'),
-                dict(func=lambda x: [value * 2 for value in x], label='multiply')
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
             ],
             dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
             xlabel='samples',
             title='test',
             logx=False

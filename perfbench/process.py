@@ -34,23 +34,33 @@ def _determine_number(timer):
     return number
 
 
-def _bench(setups, kernels, dataset_sizes, number=0, repeat=0, disable_tqdm=False):
+def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=False):
     if repeat == 0:
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
 
-    shape = (len(kernels), len(setups))
+    shape = (len(kernels), len(datasets))
     res = utils.create_empty_array_of_shape(shape)
     for i, j in itertools.product(range(shape[0]), range(shape[1])):
         res[i][j] = []
 
-    for i, setup in enumerate(tqdm(setups, disable=disable_tqdm)):
-        sfn = setup.get('func')
-        for j, ntime in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
-            data = sfn(ntime)
+    for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
+        s_stmt = dataset.get('stmt')
+        old_s_stmt = dataset.get('func')
+        if old_s_stmt is not None:
+            warnings.warn('`func` is deprecated. Use `stmt`.')
+            s_stmt = old_s_stmt
+
+        for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
+            data = s_stmt(dataset_size)
             for k, kernel in enumerate(kernels):
-                kfn = kernel.get('func')
-                timer = timeit.Timer(stmt=lambda: kfn(data))
+                k_stmt = kernel.get('stmt')
+                old_k_stmt = kernel.get('func')
+                if old_k_stmt is not None:
+                    warnings.warn('`func` is deprecated. Use `stmt`.')
+                    k_stmt = old_k_stmt
+
+                timer = timeit.Timer(stmt=lambda: k_stmt(data))
                 loops = number if number > 0 else _determine_number(timer)
 
                 all_runs = timer.repeat(repeat=repeat, number=loops)
@@ -65,21 +75,25 @@ def _bench(setups, kernels, dataset_sizes, number=0, repeat=0, disable_tqdm=Fals
 class Benchmark(object):
 
     def __init__(self, *,
-                 setups,
-                 kernels,
+                 datasets=None,
+                 setups=None,
                  dataset_sizes=None,
                  ntimes=None,
+                 kernels,
                  number=0,
                  repeat=0,
                  xlabel=None,
                  title=None,
                  logx=False):
-        self._setups = setups
-        self._kernels = kernels
+        self._datasets = datasets
+        if setups is not None:
+            warnings.warn('`setups` is deprecated. Use `datasets`.')
+            self._datasets = setups
         self._dataset_sizes = dataset_sizes
         if ntimes is not None:
             warnings.warn('`ntimes` is deprecated. Use `dataset_sizes`.')
             self._dataset_sizes = ntimes
+        self._kernels = kernels
         self._number = number
         self._repeat = repeat
         self._xlabel = '' if xlabel is None else xlabel
@@ -89,9 +103,9 @@ class Benchmark(object):
 
     def run(self, disable_tqdm=False):
         self._results = _bench(
-            setups=self._setups,
-            kernels=self._kernels,
+            datasets=self._datasets,
             dataset_sizes=self._dataset_sizes,
+            kernels=self._kernels,
             number=self._number,
             repeat=self._repeat,
             disable_tqdm=disable_tqdm
@@ -132,12 +146,12 @@ class Benchmark(object):
 
     def _create_figure(self):
         '''Create a figure with multiple subplots.'''
-        nsetups = len(self._setups)
+        ndatasets = len(self._datasets)
         fig = plotly.tools.make_subplots(
-            rows=nsetups,
+            rows=ndatasets,
             cols=1,
             shared_xaxes=True,
-            subplot_titles=[setup.get('title', '') for setup in self._setups],
+            subplot_titles=[dataset.get('title', '') for dataset in self._datasets],
             print_grid=False
         )
 
@@ -151,8 +165,8 @@ class Benchmark(object):
                 x = self._dataset_sizes
                 y = [tres.average for tres in item]
 
-                if nsetups > 1:
-                    title = self._setups[j].get('title', '')
+                if ndatasets > 1:
+                    title = self._datasets[j].get('title', '')
                     suffix = ' - ' + title if title else ''
                 else:
                     suffix = ''
@@ -197,7 +211,7 @@ class Benchmark(object):
             type=self._xaxis_type,
             range=self._axis_range(sequence=self._dataset_sizes, use_log_scale=self._logx)
         )
-        for i, _ in enumerate(self._setups):
+        for i, _ in enumerate(self._datasets):
             yaxis = 'yaxis' + str(i + 1)
             fig['layout'][yaxis].update(
                 title='processing time',
@@ -205,7 +219,7 @@ class Benchmark(object):
                 autorange=True
             )
 
-        if nsetups > 1:
+        if ndatasets > 1:
             updatemenus = list([
                 dict(
                     active=0,

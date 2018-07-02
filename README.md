@@ -35,12 +35,13 @@ from perfbench.process import *
 
 
 bm = Benchmark(
-    setups=[
+    datasets=[
         dict(
             func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
             title='float64'
         )
     ],
+    dataset_sizes=[2 ** n for n in range(26)],
     kernels=[
         dict(
             func=lambda x: np.around(x),
@@ -51,7 +52,6 @@ bm = Benchmark(
             label='rint'
         )
     ],
-    dataset_sizes=[2 ** n for n in range(26)],
     xlabel='samples',
     title='around vs rint',
     logx=True
@@ -70,7 +70,7 @@ from perfbench.process import *
 
 
 bm = Benchmark(
-    setups=[
+    datasets=[
         dict(
             func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16),
             title='float16'
@@ -84,6 +84,7 @@ bm = Benchmark(
             title='float64'
         )
     ],
+    dataset_sizes=[2 ** n for n in range(26)],
     kernels=[
         dict(
             func=lambda x: np.around(x),
@@ -94,7 +95,6 @@ bm = Benchmark(
             label='rint'
         )
     ],
-    dataset_sizes=[2 ** n for n in range(26)],
     xlabel='samples',
     title='around vs rint',
     logx=True
