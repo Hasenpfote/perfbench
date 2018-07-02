@@ -37,18 +37,18 @@ from perfbench.process import *
 bm = Benchmark(
     datasets=[
         dict(
-            func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
             title='float64'
         )
     ],
     dataset_sizes=[2 ** n for n in range(26)],
     kernels=[
         dict(
-            func=lambda x: np.around(x),
+            stmt=lambda x: np.around(x),
             label='around'
         ),
         dict(
-            func=lambda x: np.rint(x),
+            stmt=lambda x: np.rint(x),
             label='rint'
         )
     ],
@@ -72,26 +72,26 @@ from perfbench.process import *
 bm = Benchmark(
     datasets=[
         dict(
-            func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16),
+            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16),
             title='float16'
         ),
         dict(
-            func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32),
+            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32),
             title='float32'
         ),
         dict(
-            func=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
             title='float64'
         )
     ],
     dataset_sizes=[2 ** n for n in range(26)],
     kernels=[
         dict(
-            func=lambda x: np.around(x),
+            stmt=lambda x: np.around(x),
             label='around'
         ),
         dict(
-            func=lambda x: np.rint(x),
+            stmt=lambda x: np.rint(x),
             label='rint'
         )
     ],
