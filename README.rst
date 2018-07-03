@@ -68,9 +68,8 @@ Usage
                label='rint'
            )
        ],
-       xlabel='samples',
+       xlabel='dataset sizes',
        title='around vs rint',
-       logx=True
    )
    bm.run()
    bm.plot()
@@ -116,9 +115,8 @@ Usage
                label='rint'
            )
        ],
-       xlabel='samples',
+       xlabel='dataset sizes',
        title='around vs rint',
-       logx=True
    )
    bm.run()
    bm.plot()
@@ -145,7 +143,7 @@ Usage
 .. code:: python
 
    # same as above
-   bm.save_as_png(filepath='/path/to/file')
+   bm.save_as_png(filepath='/path/to/file', width=1280, height=960)
 
 License
 -------

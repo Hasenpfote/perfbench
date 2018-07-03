@@ -52,9 +52,8 @@ bm = Benchmark(
             label='rint'
         )
     ],
-    xlabel='samples',
+    xlabel='dataset sizes',
     title='around vs rint',
-    logx=True
 )
 bm.run()
 bm.plot()
@@ -95,9 +94,8 @@ bm = Benchmark(
             label='rint'
         )
     ],
-    xlabel='samples',
+    xlabel='dataset sizes',
     title='around vs rint',
-    logx=True
 )
 bm.run()
 bm.plot()
@@ -115,7 +113,7 @@ bm.save_as_html(filepath='/path/to/file')
 **save as png.**
 ```python
 # same as above
-bm.save_as_png(filepath='/path/to/file')
+bm.save_as_png(filepath='/path/to/file', width=1280, height=960)
 ```
 
 ## License
