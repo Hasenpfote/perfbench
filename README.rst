@@ -41,7 +41,7 @@ Usage
 -----
 
 | **plotting a single figure.**
-| `Here <https://plot.ly/~Hasenpfote/7/perfbench-demo1/>`__ is the
+| `Here <https://plot.ly/~Hasenpfote/8/perfbench-demo1/>`__ is the
   demonstration.
 
 .. code:: python
@@ -80,7 +80,7 @@ Usage
    plot1
 
 | **plotting multiple figures.**
-| `Here <https://plot.ly/~Hasenpfote/6/perfbench-demo2/>`__ is the
+| `Here <https://plot.ly/~Hasenpfote/9/perfbench-demo2/>`__ is the
   demonstration.
 
 .. code:: python
