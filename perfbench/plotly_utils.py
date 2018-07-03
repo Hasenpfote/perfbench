@@ -161,3 +161,44 @@ def make_subplot_buttons(fig):
         )
 
     return buttons
+
+
+def make_scale_buttons(fig):
+
+    datasets = [
+        dict(label='Linear', xtype='linear', ytype='linear'),
+        dict(label='Semilog-X', xtype='log', ytype='linear'),
+        dict(label='Semilog-Y', xtype='linear', ytype='log'),
+        dict(label='Log', xtype='log', ytype='log')
+    ]
+
+    buttons = []
+
+    combs = _find_axes_combs(fig)
+
+    for dataset in datasets:
+        label = dataset.get('label')
+        xtype = dataset.get('xtype')
+        ytype = dataset.get('ytype')
+
+        arg = {}
+        for comb in combs:
+            src_xaxis, src_yaxis = comb
+            dst_xaxis = 'xaxis' if src_xaxis == 'xaxis1' else src_xaxis
+            dst_yaxis = 'yaxis' if src_yaxis == 'yaxis1' else src_yaxis
+
+            arg[dst_xaxis + '.type'] = xtype
+            arg[dst_xaxis + '.autorange'] = True
+
+            arg[dst_yaxis + '.type'] = ytype
+            arg[dst_yaxis + '.autorange'] = True
+
+        buttons.append(
+            dict(
+                label=label,
+                method='relayout',
+                args=[arg]
+            )
+        )
+
+    return buttons

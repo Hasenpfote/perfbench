@@ -16,9 +16,8 @@ def main():
             dict(stmt=lambda x: np.around(x), label='around'),
             dict(stmt=lambda x: np.rint(x), label='rint')
         ],
-        xlabel='samples',
-        title='around vs rint',
-        logx=True
+        xlabel='dataset sizes',
+        title='around vs rint'
     )
     bm.run()
     bm.plot()

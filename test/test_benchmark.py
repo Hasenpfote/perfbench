@@ -8,41 +8,6 @@ from perfbench.process import *
 
 
 class TestBenchmark(TestCase):
-    def test__xaxis_type(self):
-        bm = Benchmark(
-            datasets=[
-                dict(stmt=lambda n: [i for i in range(n)], title='')
-            ],
-            dataset_sizes=[2 ** n for n in range(3)],
-            kernels=[
-                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
-                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            xlabel='samples',
-            title='test',
-            logx=False
-        )
-        actual = bm._xaxis_type
-        self.assertTrue(isinstance(actual, str))
-        self.assertTrue(actual == '-')
-
-        bm = Benchmark(
-            datasets=[
-                dict(stmt=lambda n: [i for i in range(n)], title='')
-            ],
-            dataset_sizes=[2 ** n for n in range(3)],
-            kernels=[
-                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
-                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
-            ],
-            xlabel='samples',
-            title='test',
-            logx=True
-        )
-        actual = bm._xaxis_type
-        self.assertTrue(isinstance(actual, str))
-        self.assertTrue(actual == 'log')
-
     def test__default_colors(self):
         actual = Benchmark._default_colors()
         self.assertTrue(isinstance(actual, list))
@@ -76,9 +41,8 @@ class TestBenchmark(TestCase):
                 dict(stmt=lambda x: [value + 2 for value in x], label='add'),
                 dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            xlabel='samples',
-            title='test',
-            logx=False
+            xlabel='dataset sizes',
+            title='test'
         )
         bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
@@ -93,9 +57,8 @@ class TestBenchmark(TestCase):
                 dict(stmt=lambda x: [value + 2 for value in x], label='add'),
                 dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            xlabel='samples',
-            title='test',
-            logx=False
+            xlabel='dataset sizes',
+            title='test'
         )
         bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
@@ -110,9 +73,8 @@ class TestBenchmark(TestCase):
                 dict(stmt=lambda x: [value + 2 for value in x], label='add'),
                 dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            xlabel='samples',
-            title='test',
-            logx=False
+            xlabel='dataset sizes',
+            title='test'
         )
         bm.run(disable_tqdm=True)
         bm.save_as_html(filepath='test.html')
@@ -128,9 +90,8 @@ class TestBenchmark(TestCase):
                 dict(stmt=lambda x: [value + 2 for value in x], label='add'),
                 dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
             ],
-            xlabel='samples',
-            title='test',
-            logx=False
+            xlabel='dataset sizes',
+            title='test'
         )
         bm.run(disable_tqdm=True)
         ret = bm.save_as_png(filepath='test.png')

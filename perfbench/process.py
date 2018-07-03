@@ -84,7 +84,7 @@ class Benchmark(object):
                  repeat=0,
                  xlabel=None,
                  title=None,
-                 logx=False):
+                 logx=None):
         self._datasets = datasets
         if setups is not None:
             warnings.warn('`setups` is deprecated. Use `datasets`.')
@@ -98,7 +98,8 @@ class Benchmark(object):
         self._repeat = repeat
         self._xlabel = '' if xlabel is None else xlabel
         self._title = '' if title is None else title
-        self._logx = logx
+        if logx is not None:
+            warnings.warn('`logx` is deprecated.')
         self._results = None
 
     def run(self, disable_tqdm=False):
@@ -110,10 +111,6 @@ class Benchmark(object):
             repeat=self._repeat,
             disable_tqdm=disable_tqdm
         )
-
-    @property
-    def _xaxis_type(self):
-        return 'log' if self._logx else '-'
 
     @classmethod
     def _default_colors(cls):
@@ -208,8 +205,8 @@ class Benchmark(object):
         # update the layout.
         fig['layout']['xaxis1'].update(
             title=self._xlabel,
-            type=self._xaxis_type,
-            range=self._axis_range(sequence=self._dataset_sizes, use_log_scale=self._logx)
+            type='log',
+            autorange=True
         )
         for i, _ in enumerate(self._datasets):
             yaxis = 'yaxis' + str(i + 1)
@@ -219,21 +216,32 @@ class Benchmark(object):
                 autorange=True
             )
 
+        updatemenus = [
+            dict(
+                active=3,
+                buttons=plotly_utils.make_scale_buttons(fig),
+                direction='down',
+                showactive=True,
+                x=0.0,
+                xanchor='left',
+                y=1.2,
+                yanchor='top'
+            )
+        ]
+
         if ndatasets > 1:
-            updatemenus = list([
+            updatemenus.append(
                 dict(
                     active=0,
                     buttons=plotly_utils.make_subplot_buttons(fig),
                     direction='down',
                     showactive=True,
-                    x=0.0,
+                    x=0.1,
                     xanchor='left',
                     y=1.2,
                     yanchor='top'
                 )
-            ])
-        else:
-            updatemenus = []
+            )
 
         fig['layout'].update(title=self._title, updatemenus=updatemenus)
 
