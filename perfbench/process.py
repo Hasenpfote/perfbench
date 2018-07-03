@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
 import timeit
 import itertools
 import math
@@ -264,15 +265,23 @@ class Benchmark(object):
         fig = self._create_figure()
         plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
 
-    def save_as_png(self, *, filepath='plot_image.png'):
+    def save_as_png(self, *, filepath='plot_image.png', width=1280, height=960):
         if not utils.cmd_exists('orca'):
             warnings.warn('`orca` is not installed, this function can not be used.')
             return False
 
+        dirpath, filename = os.path.split(filepath)
         fig = self._create_figure()
         dumps = json.dumps(fig)
         try:
-            subprocess.check_call(['orca', 'graph', dumps, '-o', filepath])
+            subprocess.check_call([
+                'orca',
+                'graph', dumps,
+                '-d', dirpath,
+                '-o', filename,
+                '--width', str(width),
+                '--height', str(height)
+            ])
             return True
         except subprocess.CalledProcessError:
             return False
