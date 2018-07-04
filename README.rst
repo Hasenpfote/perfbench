@@ -16,7 +16,9 @@ Feature
 -  The result of the benchmark can be saved locally as html.
 -  The result of the benchmark can be saved locally as png.
    **Requires installation
-   of**\ `orca <https://github.com/plotly/orca>`__\ **.**
+   of**\ `orca <https://github.com/plotly/orca>`__\ **.
+   When not to use the function, you do not need to install orca
+   separately.**
 
 Compatibility
 -------------
@@ -131,14 +133,14 @@ Usage
 
    plot2
 
-**save as html.**
+**save as a html.**
 
 .. code:: python
 
    # same as above
    bm.save_as_html(filepath='/path/to/file')
 
-**save as png.**
+**save as a png.**
 
 .. code:: python
 
