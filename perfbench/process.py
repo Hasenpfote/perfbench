@@ -256,6 +256,11 @@ class Benchmark(object):
         self.plot()
 
     def plot(self, *, auto_open=True):
+        '''Create a graph locally as an HTML document.
+
+        Args:
+            auto_open: If True, open the saved file in a web browser after saving.
+        '''
         fig = self._create_figure()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
@@ -264,10 +269,26 @@ class Benchmark(object):
             plotly.offline.plot(fig, show_link=False, auto_open=auto_open)
 
     def save_as_html(self, *, filepath='temp-plot.html'):
+        '''Save as a html.
+
+        Args:
+            filepath: The local filepath to save the outputted chart to.
+                If the filepath already exists, it will be overwritten.
+        '''
         fig = self._create_figure()
         plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
 
     def save_as_png(self, *, filepath='plot_image.png', width=1280, height=960):
+        '''Save as a png.
+
+        Args:
+            filepath: The local filepath to save the image to.
+            width: Specifies the width of the image in `px`.
+            height: Specifies the height of the image in `px`.
+
+        Returns:
+            True if successful, false otherwise.
+        '''
         if not utils.cmd_exists('orca'):
             warnings.warn('`orca` is not installed, this function can not be used.')
             return False
