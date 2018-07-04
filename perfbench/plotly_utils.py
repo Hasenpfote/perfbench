@@ -28,24 +28,30 @@ def _glab_keys(d, pattern):
     return res
 
 
-def _contains_free_anchor(fig, axes):
+def _contains_free_anchor(layout, axes):
     for axis in axes:
-        anchor = fig.layout[axis].get('anchor')
+        anchor = layout.get(axis, {}).get('anchor', '')
         if anchor == 'free':
             return True
 
     return False
 
 
-def _find_axes_combs(fig):
-    xaxes = _glab_keys(fig.layout, r'^xaxis[0-9]{0,1}')
-    yaxes = _glab_keys(fig.layout, r'^yaxis[0-9]{0,1}')
-
-    is_shared_xaxes = _contains_free_anchor(fig, yaxes)
-    is_shared_yaxes = _contains_free_anchor(fig, xaxes)
-
+def _find_axes_combs(layout):
+    '''Find axes combinations.'''
+    xaxes = _glab_keys(layout, r'^xaxis[0-9]*')
     n_xaxes = len(xaxes)
+    if n_xaxes == 0:
+        raise ValueError('xaxes not contained in layout')
+
+    yaxes = _glab_keys(layout, r'^yaxis[0-9]*')
     n_yaxes = len(yaxes)
+    if n_yaxes == 0:
+        raise ValueError('yaxes not contained in layout')
+
+    is_shared_xaxes = _contains_free_anchor(layout, yaxes)
+    is_shared_yaxes = _contains_free_anchor(layout, xaxes)
+
     if is_shared_xaxes and is_shared_yaxes:
         xaxes = xaxes * n_yaxes
         yaxes = yaxes * n_xaxes
@@ -60,14 +66,14 @@ def _find_axes_combs(fig):
     return [(xaxis, yaxis) for xaxis, yaxis in zip(xaxes, yaxes)]
 
 
-def make_subplot_buttons(fig):
+def make_subplot_buttons(layout):
     '''Make subplot buttons'''
     buttons = []
 
-    combs = _find_axes_combs(fig)
+    combs = _find_axes_combs(layout)
 
     # labels
-    annotations = fig.layout.get('annotations', [])
+    annotations = layout.get('annotations', [])
     button_labels = ['all', ]
     if annotations == []:
         for i, _ in enumerate(combs):
@@ -82,28 +88,28 @@ def make_subplot_buttons(fig):
     # all
     args = [dict(visible=[True for _ in combs]), ]
 
-    temp = {}
+    arg = {}
 
     for i, annotation in enumerate(annotations):
         s = 'annotations[{}]'.format(i)
-        temp[s + '.visible'] = True
-        temp[s + '.x'] = annotation.get('x', 1.0)
-        temp[s + '.y'] = annotation.get('y', 1.0)
+        arg[s + '.visible'] = True
+        arg[s + '.x'] = annotation.get('x', 1.0)
+        arg[s + '.y'] = annotation.get('y', 1.0)
 
     for comb in combs:
         src_xaxis, src_yaxis = comb
         dst_xaxis = 'xaxis' if src_xaxis == 'xaxis1' else src_xaxis
         dst_yaxis = 'yaxis' if src_yaxis == 'yaxis1' else src_yaxis
 
-        temp[dst_xaxis + '.visible'] = True
-        temp[dst_xaxis + '.domain'] = fig.layout[src_xaxis]['domain']
-        temp[dst_xaxis + '.position'] = fig.layout[src_xaxis].get('position', 0.0)
+        arg[dst_xaxis + '.visible'] = True
+        arg[dst_xaxis + '.domain'] = layout[src_xaxis]['domain']
+        arg[dst_xaxis + '.position'] = layout[src_xaxis].get('position', 0.0)
 
-        temp[dst_yaxis + '.visible'] = True
-        temp[dst_yaxis + '.domain'] = fig.layout[src_yaxis]['domain']
-        temp[dst_yaxis + '.position'] = fig.layout[src_yaxis].get('position', 0.0)
+        arg[dst_yaxis + '.visible'] = True
+        arg[dst_yaxis + '.domain'] = layout[src_yaxis]['domain']
+        arg[dst_yaxis + '.position'] = layout[src_yaxis].get('position', 0.0)
 
-    args.append(temp)
+    args.append(arg)
 
     buttons.append(
         dict(
@@ -117,16 +123,16 @@ def make_subplot_buttons(fig):
     for index, cur_cmb in enumerate(combs):
         args = [dict(visible=[True if i == index else False for i, _ in enumerate(combs)]), ]
 
-        temp = {}
+        arg = {}
 
         for i, annotation in enumerate(annotations):
             s = 'annotations[{}]'.format(i)
             if i == index:
-                temp[s + '.visible'] = True
-                temp[s + '.x'] = 0.5
-                temp[s + '.y'] = 1.0
+                arg[s + '.visible'] = True
+                arg[s + '.x'] = 0.5
+                arg[s + '.y'] = 1.0
             else:
-                temp[s + '.visible'] = False
+                arg[s + '.visible'] = False
 
         for i, comb in enumerate(combs):
             src_xaxis, src_yaxis = comb
@@ -134,23 +140,23 @@ def make_subplot_buttons(fig):
             dst_yaxis = 'yaxis' if src_yaxis == 'yaxis1' else src_yaxis
 
             if i == index:
-                temp[dst_xaxis + '.visible'] = True
-                temp[dst_xaxis + '.domain'] = [0.01, 1.0]
-                temp[dst_xaxis + '.position'] = 0.0
+                arg[dst_xaxis + '.visible'] = True
+                arg[dst_xaxis + '.domain'] = [0.01, 1.0]
+                arg[dst_xaxis + '.position'] = 0.0
 
-                temp[dst_yaxis + '.visible'] = True
-                temp[dst_yaxis + '.domain'] = [0.01, 1.0]
-                temp[dst_yaxis + '.position'] = 0.0
+                arg[dst_yaxis + '.visible'] = True
+                arg[dst_yaxis + '.domain'] = [0.01, 1.0]
+                arg[dst_yaxis + '.position'] = 0.0
             else:
                 if src_xaxis != cur_cmb[0]:
-                    temp[dst_xaxis + '.visible'] = False
-                    temp[dst_xaxis + '.domain'] = [0.0, 0.01]
+                    arg[dst_xaxis + '.visible'] = False
+                    arg[dst_xaxis + '.domain'] = [0.0, 0.01]
 
                 if src_yaxis != cur_cmb[1]:
-                    temp[dst_yaxis + '.visible'] = False
-                    temp[dst_yaxis + '.domain'] = [0.0, 0.01]
+                    arg[dst_yaxis + '.visible'] = False
+                    arg[dst_yaxis + '.domain'] = [0.0, 0.01]
 
-        args.append(temp)
+        args.append(arg)
 
         buttons.append(
             dict(
@@ -163,7 +169,7 @@ def make_subplot_buttons(fig):
     return buttons
 
 
-def make_scale_buttons(fig):
+def make_scale_buttons(layout):
 
     datasets = [
         dict(label='Linear', xtype='linear', ytype='linear'),
@@ -174,7 +180,7 @@ def make_scale_buttons(fig):
 
     buttons = []
 
-    combs = _find_axes_combs(fig)
+    combs = _find_axes_combs(layout)
 
     for dataset in datasets:
         label = dataset.get('label')

@@ -204,14 +204,16 @@ class Benchmark(object):
                 fig.append_trace(trace, index, 1)
 
         # update the layout.
-        fig['layout']['xaxis1'].update(
+        layout = fig.layout
+
+        layout.xaxis1.update(
             title=self._xlabel,
             type='log',
             autorange=True
         )
         for i, _ in enumerate(self._datasets):
             yaxis = 'yaxis' + str(i + 1)
-            fig['layout'][yaxis].update(
+            layout[yaxis].update(
                 title='processing time',
                 type='log',
                 autorange=True
@@ -220,7 +222,7 @@ class Benchmark(object):
         updatemenus = [
             dict(
                 active=3,
-                buttons=plotly_utils.make_scale_buttons(fig),
+                buttons=plotly_utils.make_scale_buttons(layout=layout),
                 direction='down',
                 showactive=True,
                 x=0.0,
@@ -234,7 +236,7 @@ class Benchmark(object):
             updatemenus.append(
                 dict(
                     active=0,
-                    buttons=plotly_utils.make_subplot_buttons(fig),
+                    buttons=plotly_utils.make_subplot_buttons(layout=layout),
                     direction='down',
                     showactive=True,
                     x=0.1,
@@ -244,7 +246,7 @@ class Benchmark(object):
                 )
             )
 
-        fig['layout'].update(title=self._title, updatemenus=updatemenus)
+        layout.update(title=self._title, updatemenus=updatemenus)
 
         return fig
 
