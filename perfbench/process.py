@@ -271,6 +271,9 @@ class Benchmark(object):
             return False
 
         dirpath, filename = os.path.split(filepath)
+        if not dirpath:
+            dirpath = '.'
+
         fig = self._create_figure()
         dumps = json.dumps(fig)
         try:
