@@ -45,7 +45,7 @@ Installation
 Usage
 -----
 
-| **plotting a single figure.**
+| **Plotting a single figure.**
 | `Here <https://plot.ly/~Hasenpfote/8/perfbench-demo1/>`__ is the
   demonstration.
 
@@ -79,12 +79,12 @@ Usage
    bm.run()
    bm.plot()
 
-.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot1.png
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plotting_a_single_figure.png
    :alt: plot1
 
    plot1
 
-| **plotting multiple figures.**
+| **Plotting multiple plots on a single figure.**
 | `Here <https://plot.ly/~Hasenpfote/9/perfbench-demo2/>`__ is the
   demonstration.
 
@@ -126,24 +126,67 @@ Usage
    bm.run()
    bm.plot()
 
-.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2.png
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plotting_multiple_plots_on_a_single_figure.png
    :alt: plot2
 
    plot2
 
-.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plot2_2.png
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/switching_between_subplots.png
    :alt: plot2
 
    plot2
 
-**save as a html.**
+**Switching between layout sizes.**
+
+.. code:: python
+
+   import numpy as np
+   from perfbench.process import *
+
+
+   bm = Benchmark(
+       datasets=[
+           dict(
+               stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+               title='float64'
+           )
+       ],
+       dataset_sizes=[2 ** n for n in range(26)],
+       kernels=[
+           dict(
+               stmt=lambda x: np.around(x),
+               label='around'
+           ),
+           dict(
+               stmt=lambda x: np.rint(x),
+               label='rint'
+           )
+       ],
+       xlabel='dataset sizes',
+       title='around vs rint',
+       layout_sizes=[
+           dict(label='VGA', width=640, height=480),
+           dict(label='SVGA', width=800, height=600),
+           dict(label='XGA', width=1024, height=768),
+           dict(label='HD 720p', width=1280, height=960),
+       ]
+   )
+   bm.run()
+   bm.plot()
+
+.. figure:: https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/switching_between_layout_sizes.png
+   :alt: plot3
+
+   plot3
+
+**Save as a html.**
 
 .. code:: python
 
    # same as above
    bm.save_as_html(filepath='/path/to/file')
 
-**save as a png.**
+**Save as a png.**
 
 .. code:: python
 
