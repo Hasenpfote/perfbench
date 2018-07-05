@@ -9,8 +9,11 @@ perfbench
 perfbench is a perfomance benchmarking module for Python code.
 
 ## Feature
-* The result of the benchmark can be saved locally as html.
-* The result of the benchmark can be saved locally as png.  
+* It is possible to switch between layout sizes dynamically.
+* It is possible to switch between axes scales dynamically.
+* It is possible to switch between subplots dynamically.
+* The result of the benchmark can be saved locally as a html.
+* The result of the benchmark can be saved locally as a png.  
 **Requires installation of [orca](https://github.com/plotly/orca).  
 When not to use the function, you do not need to install orca separately.**
 
