@@ -97,3 +97,47 @@ class TestBenchmark(TestCase):
         ret = bm.save_as_png(filepath='test.png')
         self.assertTrue(ret)
         #self.assertTrue(os.path.exists('./test.png'))
+
+    def test_layout_sizes(self):
+        bm = Benchmark(
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
+            xlabel='dataset sizes',
+            title='test',
+            layout_sizes=[
+                dict(label='VGA', width=640, height=480),
+                dict(label='SVGA', width=800, height=600),
+                dict(label='XGA', width=1024, height=768),
+                dict(label='HD 720p', width=1280, height=960),
+            ]
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)
+
+        bm = Benchmark(
+            datasets=[
+                dict(stmt=lambda n: [int(i) for i in range(n)], title='int'),
+                dict(stmt=lambda n: [float(i) for i in range(n)], title='float')
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
+            xlabel='dataset sizes',
+            title='test',
+            layout_sizes=[
+                dict(label='VGA', width=640, height=480),
+                dict(label='SVGA', width=800, height=600),
+                dict(label='XGA', width=1024, height=768),
+                dict(label='HD 720p', width=1280, height=960),
+            ]
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)

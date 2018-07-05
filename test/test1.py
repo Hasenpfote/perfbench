@@ -17,7 +17,13 @@ def main():
             dict(stmt=lambda x: np.rint(x), label='rint')
         ],
         xlabel='dataset sizes',
-        title='around vs rint'
+        title='around vs rint',
+        layout_sizes=[
+            dict(label='VGA', width=640, height=480),
+            dict(label='SVGA', width=800, height=600),
+            dict(label='XGA', width=1024, height=768),
+            dict(label='HD 720p', width=1280, height=960),
+        ]
     )
     bm.run()
     bm.plot()

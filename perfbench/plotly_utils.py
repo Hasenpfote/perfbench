@@ -67,7 +67,7 @@ def _find_axes_combs(layout):
 
 
 def make_subplot_buttons(layout):
-    '''Make subplot buttons'''
+    '''Make subplot buttons.'''
     buttons = []
 
     combs = _find_axes_combs(layout)
@@ -170,7 +170,7 @@ def make_subplot_buttons(layout):
 
 
 def make_scale_buttons(layout):
-
+    '''Make scale buttons.'''
     datasets = [
         dict(label='Linear', xtype='linear', ytype='linear'),
         dict(label='Semilog-X', xtype='log', ytype='linear'),
@@ -198,6 +198,32 @@ def make_scale_buttons(layout):
 
             arg[dst_yaxis + '.type'] = ytype
             arg[dst_yaxis + '.autorange'] = True
+
+        buttons.append(
+            dict(
+                label=label,
+                method='relayout',
+                args=[arg]
+            )
+        )
+
+    return buttons
+
+
+def make_layout_size_buttons(datasets):
+    '''Make layout size buttons.'''
+    buttons = []
+
+    for dataset in datasets:
+        label = dataset.get('label', '')
+        width = dataset.get('width')
+        height = dataset.get('height')
+
+        arg = dict(
+            autosize=True if width is None or height is None else False,
+            width=0 if width is None else width,
+            height=0 if height is None else height
+        )
 
         buttons.append(
             dict(

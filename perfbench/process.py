@@ -75,32 +75,43 @@ def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=Fa
 
 class Benchmark(object):
 
-    def __init__(self, *,
-                 datasets=None,
-                 setups=None,
-                 dataset_sizes=None,
-                 ntimes=None,
-                 kernels,
-                 number=0,
-                 repeat=0,
-                 xlabel=None,
-                 title=None,
-                 logx=None):
+    def __init__(
+            self, *,
+            datasets=None,
+            setups=None,
+            dataset_sizes=None,
+            ntimes=None,
+            kernels,
+            number=0,
+            repeat=0,
+            xlabel=None,
+            title=None,
+            logx=None,
+            layout_sizes=None
+    ):
         self._datasets = datasets
         if setups is not None:
             warnings.warn('`setups` is deprecated. Use `datasets`.')
             self._datasets = setups
+
         self._dataset_sizes = dataset_sizes
         if ntimes is not None:
             warnings.warn('`ntimes` is deprecated. Use `dataset_sizes`.')
             self._dataset_sizes = ntimes
+
         self._kernels = kernels
         self._number = number
         self._repeat = repeat
         self._xlabel = '' if xlabel is None else xlabel
         self._title = '' if title is None else title
+
         if logx is not None:
             warnings.warn('`logx` is deprecated.')
+
+        self._layout_sizes = None
+        if layout_sizes is not None:
+            self._layout_sizes = [dict(label='auto')] + layout_sizes
+
         self._results = None
 
     def run(self, disable_tqdm=False):
@@ -141,6 +152,60 @@ class Benchmark(object):
         y_lower = [a - b for a, b in zip(y, delta)]
         y_lower = y_lower[::-1]
         return x+x_rev, y_upper+y_lower
+
+    @staticmethod
+    def _create_update_menus(
+            layout,
+            layout_sizes=None,
+            has_multiple_subplots=False
+    ):
+        updatemenus = []
+        pos_x = 0.0
+
+        if layout_sizes is not None:
+            updatemenus.append(
+                dict(
+                    active=0,
+                    buttons=plotly_utils.make_layout_size_buttons(datasets=layout_sizes),
+                    direction='down',
+                    showactive=True,
+                    x=pos_x,
+                    xanchor='left',
+                    y=1.2,
+                    yanchor='top'
+                )
+            )
+            pos_x += 0.1
+
+        updatemenus.append(
+            dict(
+                active=3,
+                buttons=plotly_utils.make_scale_buttons(layout=layout),
+                direction='down',
+                showactive=True,
+                x=pos_x,
+                xanchor='left',
+                y=1.2,
+                yanchor='top'
+            )
+        )
+        pos_x += 0.1
+
+        if has_multiple_subplots:
+            updatemenus.append(
+                dict(
+                    active=0,
+                    buttons=plotly_utils.make_subplot_buttons(layout=layout),
+                    direction='down',
+                    showactive=True,
+                    x=pos_x,
+                    xanchor='left',
+                    y=1.2,
+                    yanchor='top'
+                )
+            )
+
+        return updatemenus
 
     def _create_figure(self):
         '''Create a figure with multiple subplots.'''
@@ -219,34 +284,14 @@ class Benchmark(object):
                 autorange=True
             )
 
-        updatemenus = [
-            dict(
-                active=3,
-                buttons=plotly_utils.make_scale_buttons(layout=layout),
-                direction='down',
-                showactive=True,
-                x=0.0,
-                xanchor='left',
-                y=1.2,
-                yanchor='top'
+        layout.update(
+            title=self._title,
+            updatemenus=self._create_update_menus(
+                layout=layout,
+                layout_sizes=self._layout_sizes,
+                has_multiple_subplots=ndatasets > 1
             )
-        ]
-
-        if ndatasets > 1:
-            updatemenus.append(
-                dict(
-                    active=0,
-                    buttons=plotly_utils.make_subplot_buttons(layout=layout),
-                    direction='down',
-                    showactive=True,
-                    x=0.1,
-                    xanchor='left',
-                    y=1.2,
-                    yanchor='top'
-                )
-            )
-
-        layout.update(title=self._title, updatemenus=updatemenus)
+        )
 
         return fig
 
