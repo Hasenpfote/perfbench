@@ -19,8 +19,8 @@ Feature
 -  The result of the benchmark can be saved locally as a html.
 -  The result of the benchmark can be saved locally as a png.
    **Requires installation
-   of**\ `orca <https://github.com/plotly/orca>`__\ **.
-   When not to use the function, you do not need to install orca
+   of**\ `orca <https://github.com/plotly/orca>`__\ **.**
+   **When not to use the function, you do not need to install orca
    separately.**
 
 Compatibility
@@ -34,6 +34,7 @@ Dependencies
 -  `ipython <https://github.com/ipython/ipython>`__\ (6.0.0 or higher.)
 -  `tqdm <https://github.com/tqdm/tqdm>`__\ (4.6.1 or higher.)
 -  `plotly <https://github.com/plotly/plotly.py>`__\ (2.7.0 or lower)
+-  `cerberus <https://github.com/pyeve/cerberus>`__\ (1.1 or higher.)
 
 Installation
 ------------

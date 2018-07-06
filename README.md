@@ -14,8 +14,8 @@ perfbench is a perfomance benchmarking module for Python code.
 * It is possible to switch between subplots dynamically.
 * The result of the benchmark can be saved locally as a html.
 * The result of the benchmark can be saved locally as a png.  
-**Requires installation of [orca](https://github.com/plotly/orca).  
-When not to use the function, you do not need to install orca separately.**
+**Requires installation of [orca](https://github.com/plotly/orca).**  
+**When not to use the function, you do not need to install orca separately.**
 
 ## Compatibility
 perfbench works with Python 3.3 or higher.
@@ -24,6 +24,7 @@ perfbench works with Python 3.3 or higher.
 * [ipython](https://github.com/ipython/ipython)(6.0.0 or higher.)
 * [tqdm](https://github.com/tqdm/tqdm)(4.6.1 or higher.)
 * [plotly](https://github.com/plotly/plotly.py)(2.7.0 or lower)
+* [cerberus](https://github.com/pyeve/cerberus)(1.1 or higher.)
 
 ## Installation
 ```
