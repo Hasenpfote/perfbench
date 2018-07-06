@@ -11,7 +11,7 @@ import plotly
 from IPython.core.magics.execution import TimeitResult
 from . import utils
 from . import plotly_utils
-from . import validators
+from . import _validators
 
 
 try:
@@ -94,16 +94,16 @@ class Benchmark(object):
         if setups is not None:
             warnings.warn('`setups` is deprecated. Use `datasets`.')
             self._datasets = setups
-        validators.validate_datasets(self._datasets)
+        _validators.validate_datasets(self._datasets)
 
         self._dataset_sizes = dataset_sizes
         if ntimes is not None:
             warnings.warn('`ntimes` is deprecated. Use `dataset_sizes`.')
             self._dataset_sizes = ntimes
-        validators.validate_dataset_sizes(self._dataset_sizes)
+        _validators.validate_dataset_sizes(self._dataset_sizes)
 
         self._kernels = kernels
-        validators.validate_kernels(self._kernels)
+        _validators.validate_kernels(self._kernels)
 
         self._number = number
         self._repeat = repeat
@@ -116,7 +116,7 @@ class Benchmark(object):
         self._layout_sizes = None
         if layout_sizes is not None:
             self._layout_sizes = [dict(label='auto')] + layout_sizes
-            validators.validate_layout_sizes(self._layout_sizes)
+            _validators.validate_layout_sizes(self._layout_sizes)
 
         self._results = None
 
