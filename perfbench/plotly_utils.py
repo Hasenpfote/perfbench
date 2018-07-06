@@ -18,20 +18,22 @@ except ImportError:
 
 
 def _glab_keys(d, pattern):
-    reobj = re.compile(pattern)
-    res = []
-    for key in d.keys():
-        if reobj.match(key):
-            res.append(key)
-    res.sort()
+    prog = re.compile(pattern)
+    ret = [key for key in d.keys() if prog.match(key)]
+    ret.sort()
+    return ret
 
-    return res
+
+def _grab_attributes(obj, pattern):
+    prog = re.compile(pattern)
+    ret = [attr for attr in dir(obj) if prog.match(attr)]
+    ret.sort()
+    return ret
 
 
 def _contains_free_anchor(layout, axes):
     for axis in axes:
-        anchor = layout.get(axis, {}).get('anchor', '')
-        if anchor == 'free':
+        if layout[axis].anchor == 'free':
             return True
 
     return False
@@ -73,17 +75,20 @@ def make_subplot_buttons(layout):
     combs = _find_axes_combs(layout)
 
     # labels
-    annotations = layout.get('annotations', [])
+    annotations = layout.annotations
+    if annotations is None:
+        annotations = []
+
     button_labels = ['all', ]
-    if annotations == []:
-        for i, _ in enumerate(combs):
-            button_labels.append('subplot{}'.format(i + 1))
-    else:
+    if annotations:
         for i, annotation in enumerate(itertools.zip_longest(combs, annotations)):
             if annotation[1] is None:
                 button_labels.append('subplot{}'.format(i + 1))
             else:
-                button_labels.append(annotation[1]['text'])
+                button_labels.append(annotation[1].text)
+    else:
+        for i, _ in enumerate(combs):
+            button_labels.append('subplot{}'.format(i + 1))
 
     # all
     args = [dict(visible=[True for _ in combs]), ]
@@ -93,8 +98,8 @@ def make_subplot_buttons(layout):
     for i, annotation in enumerate(annotations):
         s = 'annotations[{}]'.format(i)
         arg[s + '.visible'] = True
-        arg[s + '.x'] = annotation.get('x', 1.0)
-        arg[s + '.y'] = annotation.get('y', 1.0)
+        arg[s + '.x'] = annotation.x
+        arg[s + '.y'] = annotation.y
 
     for comb in combs:
         src_xaxis, src_yaxis = comb
@@ -102,12 +107,12 @@ def make_subplot_buttons(layout):
         dst_yaxis = 'yaxis' if src_yaxis == 'yaxis1' else src_yaxis
 
         arg[dst_xaxis + '.visible'] = True
-        arg[dst_xaxis + '.domain'] = layout[src_xaxis]['domain']
-        arg[dst_xaxis + '.position'] = layout[src_xaxis].get('position', 0.0)
+        arg[dst_xaxis + '.domain'] = layout[src_xaxis].domain
+        arg[dst_xaxis + '.position'] = layout[src_xaxis].position
 
         arg[dst_yaxis + '.visible'] = True
-        arg[dst_yaxis + '.domain'] = layout[src_yaxis]['domain']
-        arg[dst_yaxis + '.position'] = layout[src_yaxis].get('position', 0.0)
+        arg[dst_yaxis + '.domain'] = layout[src_yaxis].domain
+        arg[dst_yaxis + '.position'] = layout[src_yaxis].position
 
     args.append(arg)
 

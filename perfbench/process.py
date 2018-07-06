@@ -290,13 +290,11 @@ class Benchmark(object):
                 autorange=True
             )
 
-        layout.update(
-            title=self._title,
-            updatemenus=self._create_update_menus(
-                layout=layout,
-                layout_sizes=self._layout_sizes,
-                has_multiple_subplots=ndatasets > 1
-            )
+        layout.title = self._title
+        layout.updatemenus = self._create_update_menus(
+            layout=layout,
+            layout_sizes=self._layout_sizes,
+            has_multiple_subplots=ndatasets > 1
         )
 
         return fig
