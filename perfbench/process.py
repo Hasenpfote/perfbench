@@ -349,7 +349,7 @@ class Benchmark(object):
             dirpath = '.'
 
         fig = self._create_figure()
-        dumps = json.dumps(fig)
+        dumps = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         try:
             subprocess.check_call([
                 'orca',
