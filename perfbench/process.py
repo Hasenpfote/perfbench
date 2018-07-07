@@ -74,6 +74,10 @@ def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=Fa
     return res
 
 
+class NotReadyError(Exception):
+    pass
+
+
 class Benchmark(object):
 
     def __init__(
@@ -108,7 +112,7 @@ class Benchmark(object):
 
         self._figure = None
 
-    def run(self, disable_tqdm=False):
+    def run(self, *, disable_tqdm=False):
         results = _bench(
             datasets=self._datasets,
             dataset_sizes=self._dataset_sizes,
@@ -295,6 +299,9 @@ class Benchmark(object):
         Args:
             auto_open: If True, open the saved file in a web browser after saving.
         '''
+        if self._figure is None:
+            raise NotReadyError('Benchmark results are not ready yet.')
+
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
             plotly.offline.iplot(self._figure, show_link=False)
@@ -308,6 +315,9 @@ class Benchmark(object):
             filepath: The local filepath to save the outputted chart to.
                 If the filepath already exists, it will be overwritten.
         '''
+        if self._figure is None:
+            raise NotReadyError('Benchmark results are not ready yet.')
+
         plotly.offline.plot(self._figure, show_link=False, auto_open=False, filename=filepath)
 
     def save_as_png(self, *, filepath='plot_image.png', width=1280, height=960):
@@ -328,6 +338,9 @@ class Benchmark(object):
         dirpath, filename = os.path.split(filepath)
         if not dirpath:
             dirpath = '.'
+
+        if self._figure is None:
+            raise NotReadyError('Benchmark results are not ready yet.')
 
         dumps = json.dumps(self._figure, cls=plotly.utils.PlotlyJSONEncoder)
         try:

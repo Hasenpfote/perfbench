@@ -141,3 +141,25 @@ class TestBenchmark(TestCase):
         )
         bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
+
+    def test_results_are_not_ready(self):
+        bm = Benchmark(
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+            ],
+            xlabel='dataset sizes',
+            title='test',
+        )
+
+        with self.assertRaises(NotReadyError):
+            bm.plot(auto_open=False)
+
+        with self.assertRaises(NotReadyError):
+            bm.save_as_html(filepath='test.html')
+
+        with self.assertRaises(NotReadyError):
+            bm.save_as_png(filepath='test.png')
