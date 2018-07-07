@@ -106,10 +106,10 @@ class Benchmark(object):
             self._layout_sizes = [dict(label='auto')] + layout_sizes
             _validators.validate_layout_sizes(self._layout_sizes)
 
-        self._results = None
+        self._figure = None
 
     def run(self, disable_tqdm=False):
-        self._results = _bench(
+        results = _bench(
             datasets=self._datasets,
             dataset_sizes=self._dataset_sizes,
             kernels=self._kernels,
@@ -117,6 +117,7 @@ class Benchmark(object):
             repeat=self._repeat,
             disable_tqdm=disable_tqdm
         )
+        self._figure = self._create_figure(benchmark_results=results)
 
     @classmethod
     def _default_colors(cls):
@@ -201,7 +202,7 @@ class Benchmark(object):
 
         return updatemenus
 
-    def _create_figure(self):
+    def _create_figure(self, *, benchmark_results):
         '''Create a figure with multiple subplots.'''
         ndatasets = len(self._datasets)
         subplots = plotly.tools.make_subplots(
@@ -214,7 +215,7 @@ class Benchmark(object):
         fig = plotly.graph_objs.FigureWidget(subplots)
 
         # for averages.
-        for i, result in enumerate(self._results):
+        for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
             name = self._kernels[i].get('label', '')
             color = self._color(index=i)
@@ -242,7 +243,7 @@ class Benchmark(object):
                 fig.add_trace(trace, row=index, col=1)
 
         # for standard deviations.
-        for i, result in enumerate(self._results):
+        for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
             color = self._color(index=i)
             for j, item in enumerate(result):
@@ -294,12 +295,11 @@ class Benchmark(object):
         Args:
             auto_open: If True, open the saved file in a web browser after saving.
         '''
-        fig = self._create_figure()
         if utils.is_interactive():
             plotly.offline.init_notebook_mode()
-            plotly.offline.iplot(fig, show_link=False)
+            plotly.offline.iplot(self._figure, show_link=False)
         else:
-            plotly.offline.plot(fig, show_link=False, auto_open=auto_open)
+            plotly.offline.plot(self._figure, show_link=False, auto_open=auto_open)
 
     def save_as_html(self, *, filepath='temp-plot.html'):
         '''Save as a html.
@@ -308,8 +308,7 @@ class Benchmark(object):
             filepath: The local filepath to save the outputted chart to.
                 If the filepath already exists, it will be overwritten.
         '''
-        fig = self._create_figure()
-        plotly.offline.plot(fig, show_link=False, auto_open=False, filename=filepath)
+        plotly.offline.plot(self._figure, show_link=False, auto_open=False, filename=filepath)
 
     def save_as_png(self, *, filepath='plot_image.png', width=1280, height=960):
         '''Save as a png.
@@ -330,8 +329,7 @@ class Benchmark(object):
         if not dirpath:
             dirpath = '.'
 
-        fig = self._create_figure()
-        dumps = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        dumps = json.dumps(self._figure, cls=plotly.utils.PlotlyJSONEncoder)
         try:
             subprocess.check_call([
                 'orca',
