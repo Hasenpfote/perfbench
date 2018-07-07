@@ -33,8 +33,11 @@ Dependencies
 
 -  `ipython <https://github.com/ipython/ipython>`__\ (6.0.0 or higher.)
 -  `tqdm <https://github.com/tqdm/tqdm>`__\ (4.6.1 or higher.)
--  `plotly <https://github.com/plotly/plotly.py>`__\ (2.7.0 or lower)
 -  `cerberus <https://github.com/pyeve/cerberus>`__\ (1.1 or higher.)
+-  `plotly <https://github.com/plotly/plotly.py>`__\ (3.0.0 or lower)
+-  `notebook <https://github.com/jupyter/notebook>`__\ (5.3 or higher.)
+-  `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`__\ (7.2
+   or higher.)
 
 Installation
 ------------

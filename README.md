@@ -23,8 +23,10 @@ perfbench works with Python 3.3 or higher.
 ## Dependencies
 * [ipython](https://github.com/ipython/ipython)(6.0.0 or higher.)
 * [tqdm](https://github.com/tqdm/tqdm)(4.6.1 or higher.)
-* [plotly](https://github.com/plotly/plotly.py)(2.7.0 or lower)
 * [cerberus](https://github.com/pyeve/cerberus)(1.1 or higher.)
+* [plotly](https://github.com/plotly/plotly.py)(3.0.0 or lower)
+* [notebook](https://github.com/jupyter/notebook)(5.3 or higher.)
+* [ipywidgets](https://github.com/jupyter-widgets/ipywidgets)(7.2 or higher.)
 
 ## Installation
 ```
