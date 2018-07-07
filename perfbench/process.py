@@ -204,13 +204,14 @@ class Benchmark(object):
     def _create_figure(self):
         '''Create a figure with multiple subplots.'''
         ndatasets = len(self._datasets)
-        fig = plotly.tools.make_subplots(
+        subplots = plotly.tools.make_subplots(
             rows=ndatasets,
             cols=1,
             shared_xaxes=True,
             subplot_titles=[dataset.get('title', '') for dataset in self._datasets],
             print_grid=False
         )
+        fig = plotly.graph_objs.FigureWidget(subplots)
 
         # for averages.
         for i, result in enumerate(self._results):
@@ -238,7 +239,7 @@ class Benchmark(object):
                     legendgroup=legendgroup,
                     line=dict(color=color)
                 )
-                fig.append_trace(trace, index, 1)
+                fig.add_trace(trace, row=index, col=1)
 
         # for standard deviations.
         for i, result in enumerate(self._results):
@@ -260,7 +261,7 @@ class Benchmark(object):
                     fill='tozerox',
                     fillcolor=fillcolor
                 )
-                fig.append_trace(trace, index, 1)
+                fig.add_trace(trace, row=index, col=1)
 
         # update the layout.
         layout = fig.layout

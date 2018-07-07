@@ -41,12 +41,12 @@ def _contains_free_anchor(layout, axes):
 
 def _find_axes_combs(layout):
     '''Find axes combinations.'''
-    xaxes = _glab_keys(layout, r'^xaxis[0-9]*')
+    xaxes = _grab_attributes(layout, r'^xaxis[0-9]*')
     n_xaxes = len(xaxes)
     if n_xaxes == 0:
         raise ValueError('xaxes not contained in layout')
 
-    yaxes = _glab_keys(layout, r'^yaxis[0-9]*')
+    yaxes = _grab_attributes(layout, r'^yaxis[0-9]*')
     n_yaxes = len(yaxes)
     if n_yaxes == 0:
         raise ValueError('yaxes not contained in layout')
