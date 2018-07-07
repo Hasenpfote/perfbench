@@ -78,28 +78,19 @@ class Benchmark(object):
 
     def __init__(
             self, *,
-            datasets=None,
-            setups=None,
-            dataset_sizes=None,
-            ntimes=None,
+            datasets,
+            dataset_sizes,
             kernels,
             number=0,
             repeat=0,
             xlabel=None,
             title=None,
-            logx=None,
             layout_sizes=None
     ):
         self._datasets = datasets
-        if setups is not None:
-            warnings.warn('`setups` is deprecated. Use `datasets`.')
-            self._datasets = setups
         _validators.validate_datasets(self._datasets)
 
         self._dataset_sizes = dataset_sizes
-        if ntimes is not None:
-            warnings.warn('`ntimes` is deprecated. Use `dataset_sizes`.')
-            self._dataset_sizes = ntimes
         _validators.validate_dataset_sizes(self._dataset_sizes)
 
         self._kernels = kernels
@@ -109,9 +100,6 @@ class Benchmark(object):
         self._repeat = repeat
         self._xlabel = '' if xlabel is None else xlabel
         self._title = '' if title is None else title
-
-        if logx is not None:
-            warnings.warn('`logx` is deprecated.')
 
         self._layout_sizes = None
         if layout_sizes is not None:
@@ -298,11 +286,6 @@ class Benchmark(object):
         )
 
         return fig
-
-    def show(self):
-        '''for backward compatibility.'''
-        warnings.warn('This function will be removed soon.')
-        self.plot()
 
     def plot(self, *, auto_open=True):
         '''Create a graph locally as an HTML document.
