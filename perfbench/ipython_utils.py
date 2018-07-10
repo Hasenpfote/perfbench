@@ -125,7 +125,7 @@ def _seconds_to_hrf(seconds, separator=' '):
 
 def _format_time(timespan, precision=3):
     if timespan > 60.0:
-        return _seconds_to_hrt(timespan)
+        return _seconds_to_hrf(timespan)
 
     units = ('s', 'ms', '\xb5s', 'ns')
     scaling = (1, 1e+3, 1e+6, 1e+9)
