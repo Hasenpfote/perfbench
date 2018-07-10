@@ -35,22 +35,12 @@ def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=Fa
         res[i][j] = []
 
     for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
-        s_stmt = dataset.get('stmt')
-        old_s_stmt = dataset.get('func')
-        if old_s_stmt is not None:
-            warnings.warn('`func` is deprecated. Use `stmt`.')
-            s_stmt = old_s_stmt
-
+        dataset_stmt = dataset.get('stmt')
         for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
-            data = s_stmt(dataset_size)
+            data = dataset_stmt(dataset_size)
             for k, kernel in enumerate(kernels):
-                k_stmt = kernel.get('stmt')
-                old_k_stmt = kernel.get('func')
-                if old_k_stmt is not None:
-                    warnings.warn('`func` is deprecated. Use `stmt`.')
-                    k_stmt = old_k_stmt
-
-                timer = timeit.Timer(stmt=lambda: k_stmt(data))
+                kernel_stmt = kernel.get('stmt')
+                timer = timeit.Timer(stmt=lambda: kernel_stmt(data))
                 loops = number if number > 0 else ipython_utils.determine_number(timer)
 
                 all_runs = timer.repeat(repeat=repeat, number=loops)
