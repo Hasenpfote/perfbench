@@ -8,8 +8,8 @@ import subprocess
 import json
 import warnings
 import plotly
-from IPython.core.magics.execution import TimeitResult
 from . import utils
+from . import ipython_utils
 from . import plotly_utils
 from . import _validators
 
@@ -22,18 +22,6 @@ try:
 
 except ImportError:
     tqdm = lambda x: x
-
-
-def _determine_number(timer):
-    '''Determine number so that 0.2 <= total time < 2.0'''
-    number = 0
-    for index in range(0, 10):
-        number = 10 ** index
-        time_number = timer.timeit(number=number)
-        if time_number >= 0.2:
-            break
-
-    return number
 
 
 def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=False):
@@ -63,13 +51,16 @@ def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=Fa
                     k_stmt = old_k_stmt
 
                 timer = timeit.Timer(stmt=lambda: k_stmt(data))
-                loops = number if number > 0 else _determine_number(timer)
+                loops = number if number > 0 else ipython_utils.determine_number(timer)
 
                 all_runs = timer.repeat(repeat=repeat, number=loops)
-                best = min(all_runs) / loops
-                worst = max(all_runs) / loops
-
-                res[k][i].append(TimeitResult(loops, repeat, best, worst, all_runs, 0, 3))
+                res[k][i].append(
+                    ipython_utils.TimeitResult(
+                        loops=loops,
+                        repeat=repeat,
+                        all_runs=all_runs
+                    )
+                )
 
     return res
 
