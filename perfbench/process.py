@@ -7,6 +7,7 @@ import math
 import subprocess
 import json
 import warnings
+import enum
 import plotly
 from . import utils
 from . import ipython_utils
@@ -59,6 +60,11 @@ class NotReadyError(Exception):
     pass
 
 
+class MeasureMode(enum.Enum):
+    STANDARD = 1
+    STATISTICS = 2
+
+
 class Benchmark(object):
 
     def __init__(
@@ -92,6 +98,8 @@ class Benchmark(object):
             _validators.validate_layout_sizes(self._layout_sizes)
 
         self._figure = None
+        #self._measure_mode = MeasureMode.STANDARD
+        self._measure_mode = MeasureMode.STATISTICS
 
     def run(self, *, disable_tqdm=False):
         results = _bench(
@@ -187,19 +195,49 @@ class Benchmark(object):
 
         return updatemenus
 
-    def _create_figure(self, *, benchmark_results):
-        '''Create a figure with multiple subplots.'''
+    def _add_standard_traces(self, *, figure, benchmark_results):
+        '''Add standard traces.'''
         ndatasets = len(self._datasets)
-        subplots = plotly.tools.make_subplots(
-            rows=ndatasets,
-            cols=1,
-            shared_xaxes=True,
-            subplot_titles=[dataset.get('title', '') for dataset in self._datasets],
-            print_grid=False
-        )
-        fig = plotly.graph_objs.FigureWidget(subplots)
+        for i, result in enumerate(benchmark_results):
+            legendgroup = str(i)
+            name = self._kernels[i].get('label', '')
+            color = self._color(index=i)
+            for j, item in enumerate(result):
+                index = j + 1
+                x = self._dataset_sizes
+                y = [tres.best for tres in item]
 
-        # for averages.
+                if ndatasets > 1:
+                    title = self._datasets[j].get('title', '')
+                    suffix = ' - ' + title if title else ''
+                else:
+                    suffix = ''
+
+                text = []
+                for tres in item:
+                    text.append(
+                        '{loops} loops, best of {runs}: {best} per loop'.format(
+                            loops=tres.loops,
+                            runs=tres.repeat,
+                            best=ipython_utils._format_time(tres.best)
+                        )
+                    )
+
+                trace = plotly.graph_objs.Scatter(
+                    x=x,
+                    y=y,
+                    name=name + suffix,
+                    text=text,
+                    hoverinfo='x+text+name',
+                    showlegend=True,
+                    legendgroup=legendgroup,
+                    line=dict(color=color),
+                )
+                figure.add_trace(trace, row=index, col=1)
+
+    def _add_statistical_traces(self, *, figure, benchmark_results):
+        '''Add statistical traces.'''
+        ndatasets = len(self._datasets)
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
             name = self._kernels[i].get('label', '')
@@ -223,11 +261,48 @@ class Benchmark(object):
                     hoverinfo='x+text+name',
                     showlegend=True,
                     legendgroup=legendgroup,
-                    line=dict(color=color)
+                    line=dict(color=color),
+                    error_y=dict(
+                        type='data',
+                        array=[tres.stdev for tres in item],
+                        visible=True,
+                        color=color
+                    )
                 )
-                fig.add_trace(trace, row=index, col=1)
+                figure.add_trace(trace, row=index, col=1)
 
-        # for standard deviations.
+    def _add_average_traces(self, *, figure, benchmark_results):
+        '''Add average_traces.'''
+        ndatasets = len(self._datasets)
+        for i, result in enumerate(benchmark_results):
+            legendgroup = str(i)
+            name = self._kernels[i].get('label', '')
+            color = self._color(index=i)
+            for j, item in enumerate(result):
+                index = j + 1
+                x = self._dataset_sizes
+                y = [tres.average for tres in item]
+
+                if ndatasets > 1:
+                    title = self._datasets[j].get('title', '')
+                    suffix = ' - ' + title if title else ''
+                else:
+                    suffix = ''
+
+                trace = plotly.graph_objs.Scatter(
+                    x=x,
+                    y=y,
+                    name=name + suffix,
+                    text=[tres.__str__() for tres in item],
+                    hoverinfo='x+text+name',
+                    showlegend=True,
+                    legendgroup=legendgroup,
+                    line=dict(color=color),
+                )
+                figure.add_trace(trace, row=index, col=1)
+
+    def _add_stdev_traces(self, *, figure, benchmark_results):
+        '''Add stdev traces.'''
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
             color = self._color(index=i)
@@ -247,7 +322,26 @@ class Benchmark(object):
                     fill='tozerox',
                     fillcolor=fillcolor
                 )
-                fig.add_trace(trace, row=index, col=1)
+                figure.add_trace(trace, row=index, col=1)
+
+    def _create_figure(self, *, benchmark_results):
+        '''Create a figure with multiple subplots.'''
+        ndatasets = len(self._datasets)
+        subplots = plotly.tools.make_subplots(
+            rows=ndatasets,
+            cols=1,
+            shared_xaxes=True,
+            subplot_titles=[dataset.get('title', '') for dataset in self._datasets],
+            print_grid=False
+        )
+        fig = plotly.graph_objs.FigureWidget(subplots)
+
+        if self._measure_mode == MeasureMode.STANDARD:
+            self._add_standard_traces(figure=fig, benchmark_results=benchmark_results)
+        else:
+            self._add_statistical_traces(figure=fig, benchmark_results=benchmark_results)
+            #self._add_average_traces(figure=fig, benchmark_results=benchmark_results)
+            #self._add_stdev_traces(figure=fig, benchmark_results=benchmark_results)
 
         # update the layout.
         layout = fig.layout
