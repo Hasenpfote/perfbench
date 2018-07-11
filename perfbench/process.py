@@ -68,6 +68,20 @@ class MeasurementMode(enum.Enum):
 
 
 class Benchmark(object):
+    '''This class measures execution speed of given code snippets.
+
+    Args:
+        datasets (list(dict)):
+        dataset_sizes (list(int)):
+        kernels (list(dict)):
+        repeat (int): Number of times the measurement is repeated.
+            When zero, this value is determined automatically.
+        number (int): Number of loops to execute per measurement.
+            When zero, this value is determined automatically.
+        xlabel (str): The text for a x-axis label.
+        title (str): The title for a figure.
+        layout_sizes (list(dict)):
+    '''
     def __init__(
             self, *,
             datasets,
@@ -79,20 +93,6 @@ class Benchmark(object):
             title=None,
             layout_sizes=None
     ):
-        '''Create a new Benchmark instance.
-
-        Args:
-            datasets (list(dict)):
-            dataset_sizes (list(int)):
-            kernels (list(dict)):
-            repeat (int): Number of times the measurement is repeated.
-                When zero, this value is determined automatically.
-            number (int): Number of loops to execute per measurement.
-                When zero, this value is determined automatically.
-            xlabel (str): The text for a x-axis label.
-            title (str): The title for a figure.
-            layout_sizes (list(dict)):
-        '''
         self._datasets = datasets
         _validators.validate_datasets(self._datasets)
 
