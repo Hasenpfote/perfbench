@@ -25,7 +25,7 @@ except ImportError:
     tqdm = lambda x: x
 
 
-def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=False):
+def _bench(datasets, dataset_sizes, kernels, repeat=0, number=0, disable_tqdm=False):
     if repeat == 0:
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
@@ -57,27 +57,42 @@ def _bench(datasets, dataset_sizes, kernels, number=0, repeat=0, disable_tqdm=Fa
 
 
 class NotReadyError(Exception):
+    '''Raised when a resource is not prepared.'''
     pass
 
 
-class MeasureMode(enum.Enum):
-    STANDARD = 1
-    STATISTICS = 2
+class MeasurementMode(enum.Enum):
+    '''Measurement mode.'''
+    STANDARD = 1  #: Perform minimum value based measurements.
+    STATISTICS = 2  #: Perform statistics based measurements.
 
 
 class Benchmark(object):
-
     def __init__(
             self, *,
             datasets,
             dataset_sizes,
             kernels,
-            number=0,
             repeat=0,
+            number=0,
             xlabel=None,
             title=None,
             layout_sizes=None
     ):
+        '''Create a new Benchmark instance.
+
+        Args:
+            datasets (list(dict)):
+            dataset_sizes (list(int)):
+            kernels (list(dict)):
+            repeat (int): Number of times the measurement is repeated.
+                When zero, this value is determined automatically.
+            number (int): Number of loops to execute per measurement.
+                When zero, this value is determined automatically.
+            xlabel (str): The text for a x-axis label.
+            title (str): The title for a figure.
+            layout_sizes (list(dict)):
+        '''
         self._datasets = datasets
         _validators.validate_datasets(self._datasets)
 
@@ -87,8 +102,16 @@ class Benchmark(object):
         self._kernels = kernels
         _validators.validate_kernels(self._kernels)
 
-        self._number = number
-        self._repeat = repeat
+        if repeat >= 0:
+            self._repeat = repeat
+        else:
+            raise ValueError('`repeat` must be greater than or equal to 0.')
+
+        if number >= 0:
+            self._number = number
+        else:
+            raise ValueError('`number` must be greater than or equal to 0.')
+
         self._xlabel = '' if xlabel is None else xlabel
         self._title = '' if title is None else title
 
@@ -98,16 +121,16 @@ class Benchmark(object):
             _validators.validate_layout_sizes(self._layout_sizes)
 
         self._figure = None
-        #self._measure_mode = MeasureMode.STANDARD
-        self._measure_mode = MeasureMode.STATISTICS
+        self._measurement_mode = MeasurementMode.STANDARD
+        #self._measurement_mode = MeasurementMode.STATISTICS
 
     def run(self, *, disable_tqdm=False):
         results = _bench(
             datasets=self._datasets,
             dataset_sizes=self._dataset_sizes,
             kernels=self._kernels,
-            number=self._number,
             repeat=self._repeat,
+            number=self._number,
             disable_tqdm=disable_tqdm
         )
         self._figure = self._create_figure(benchmark_results=results)
@@ -336,7 +359,7 @@ class Benchmark(object):
         )
         fig = plotly.graph_objs.FigureWidget(subplots)
 
-        if self._measure_mode == MeasureMode.STANDARD:
+        if self._measurement_mode == MeasurementMode.STANDARD:
             self._add_standard_traces(figure=fig, benchmark_results=benchmark_results)
         else:
             self._add_statistical_traces(figure=fig, benchmark_results=benchmark_results)
