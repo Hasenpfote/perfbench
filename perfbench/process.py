@@ -120,9 +120,8 @@ class Benchmark(object):
             self._layout_sizes = [dict(label='auto')] + layout_sizes
             _validators.validate_layout_sizes(self._layout_sizes)
 
+        self._measurement_mode = MeasurementMode.STATISTICS
         self._figure = None
-        self._measurement_mode = MeasurementMode.STANDARD
-        #self._measurement_mode = MeasurementMode.STATISTICS
 
     def run(self, *, disable_tqdm=False):
         results = _bench(
@@ -395,7 +394,7 @@ class Benchmark(object):
         '''Create a graph locally as an HTML document.
 
         Args:
-            auto_open: If True, open the saved file in a web browser after saving.
+            auto_open (bool): If True, open the saved file in a web browser after saving.
         '''
         if self._figure is None:
             raise NotReadyError('Benchmark results are not ready yet.')
@@ -410,7 +409,7 @@ class Benchmark(object):
         '''Save as a html.
 
         Args:
-            filepath: The local filepath to save the outputted chart to.
+            filepath (str): The local filepath to save the outputted chart to.
                 If the filepath already exists, it will be overwritten.
         '''
         if self._figure is None:
@@ -422,12 +421,12 @@ class Benchmark(object):
         '''Save as a png.
 
         Args:
-            filepath: The local filepath to save the image to.
-            width: Specifies the width of the image in `px`.
-            height: Specifies the height of the image in `px`.
+            filepath (str): The local filepath to save the image to.
+            width (int): Specifies the width of the image in `px`.
+            height (int): Specifies the height of the image in `px`.
 
         Returns:
-            True if successful, false otherwise.
+            bool: True if successful, false otherwise.
         '''
         if not utils.cmd_exists('orca'):
             warnings.warn('`orca` is not installed, this function can not be used.')
