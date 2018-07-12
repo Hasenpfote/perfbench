@@ -79,7 +79,15 @@ class TimeitResult(object):
     def stdev(self):
         return self._stdev
 
-    def __str__(self):
+    def standard_report(self):
+        fmt = '{loops} loops, best of {runs}: {best} per loop'
+        return fmt.format(
+            loops=self.loops,
+            runs=self.repeat,
+            best=_format_time(timespan=self.best, precision=self._precision)
+        )
+
+    def statistical_report(self):
         fmt = '{mean} {pm} {stdev} per loop (mean {pm} s.d. of {runs} run{run_plural}, {loops} loop{loop_plural} each)'
         return fmt.format(
             mean=_format_time(timespan=self.average, precision=self._precision),
@@ -90,6 +98,9 @@ class TimeitResult(object):
             loops=self.loops,
             loop_plural='s' if self.loops > 1 else ''
         )
+
+    def __str__(self):
+        return self.statistical_report()
 
 
 def _seconds_to_hrf(seconds, separator=' '):

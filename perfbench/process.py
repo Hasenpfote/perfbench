@@ -78,6 +78,7 @@ class Benchmark(object):
             When zero, this value is determined automatically.
         number (int): Number of loops to execute per measurement.
             When zero, this value is determined automatically.
+        measurement_mode (:class:`MeasurementMode`):
         xlabel (str): The text for a x-axis label.
         title (str): The title for a figure.
         layout_sizes (list(dict)):
@@ -89,6 +90,7 @@ class Benchmark(object):
             kernels,
             repeat=0,
             number=0,
+            measurement_mode=MeasurementMode.STANDARD,
             xlabel=None,
             title=None,
             layout_sizes=None
@@ -120,7 +122,7 @@ class Benchmark(object):
             self._layout_sizes = [dict(label='auto')] + layout_sizes
             _validators.validate_layout_sizes(self._layout_sizes)
 
-        self._measurement_mode = MeasurementMode.STATISTICS
+        self._measurement_mode = measurement_mode
         self._figure = None
 
     def run(self, *, disable_tqdm=False):
@@ -235,21 +237,11 @@ class Benchmark(object):
                 else:
                     suffix = ''
 
-                text = []
-                for tres in item:
-                    text.append(
-                        '{loops} loops, best of {runs}: {best} per loop'.format(
-                            loops=tres.loops,
-                            runs=tres.repeat,
-                            best=ipython_utils._format_time(tres.best)
-                        )
-                    )
-
                 trace = plotly.graph_objs.Scatter(
                     x=x,
                     y=y,
                     name=name + suffix,
-                    text=text,
+                    text=[tres.standard_report() for tres in item],
                     hoverinfo='x+text+name',
                     showlegend=True,
                     legendgroup=legendgroup,
@@ -264,6 +256,7 @@ class Benchmark(object):
             legendgroup = str(i)
             name = self._kernels[i].get('label', '')
             color = self._color(index=i)
+            error_color = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.5,))
             for j, item in enumerate(result):
                 index = j + 1
                 x = self._dataset_sizes
@@ -279,7 +272,7 @@ class Benchmark(object):
                     x=x,
                     y=y,
                     name=name + suffix,
-                    text=[tres.__str__() for tres in item],
+                    text=[tres.statistical_report() for tres in item],
                     hoverinfo='x+text+name',
                     showlegend=True,
                     legendgroup=legendgroup,
@@ -288,7 +281,7 @@ class Benchmark(object):
                         type='data',
                         array=[tres.stdev for tres in item],
                         visible=True,
-                        color=color
+                        color=error_color
                     )
                 )
                 figure.add_trace(trace, row=index, col=1)

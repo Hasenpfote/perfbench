@@ -63,6 +63,40 @@ class TestBenchmark(TestCase):
         bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
 
+    def test_plot_by_statistics(self):
+        bm = Benchmark(
+            datasets=[
+                dict(stmt=lambda n: [i for i in range(n)], title='')
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
+            measurement_mode=MeasurementMode.STATISTICS,
+            xlabel='dataset sizes',
+            title='test'
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)
+
+        bm = Benchmark(
+            datasets=[
+                dict(stmt=lambda n: [int(i) for i in range(n)], title='int'),
+                dict(stmt=lambda n: [float(i) for i in range(n)], title='float')
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                dict(stmt=lambda x: [value + 2 for value in x], label='add'),
+                dict(stmt=lambda x: [value * 2 for value in x], label='multiply')
+            ],
+            measurement_mode=MeasurementMode.STATISTICS,
+            xlabel='dataset sizes',
+            title='test'
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)
+
     def test_save_as_html(self):
         bm = Benchmark(
             datasets=[
