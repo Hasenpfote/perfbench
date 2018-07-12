@@ -13,6 +13,7 @@ perfbench is a perfomance benchmarking module for Python code.
 Feature
 -------
 
+-  It is possible to select measurement modes.
 -  It is possible to switch between layout sizes dynamically.
 -  It is possible to switch between axes scales dynamically.
 -  It is possible to switch between subplots dynamically.
@@ -31,6 +32,7 @@ perfbench works with Python 3.3 or higher.
 Dependencies
 ------------
 
+-  `enum34 <https://pypi.org/project/enum34/>`__
 -  `tqdm <https://github.com/tqdm/tqdm>`__\ (4.6.1 or higher.)
 -  `cerberus <https://github.com/pyeve/cerberus>`__\ (1.1 or higher.)
 -  `plotly <https://github.com/plotly/plotly.py>`__\ (3.0.0 or higher)
