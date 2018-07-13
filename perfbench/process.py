@@ -36,11 +36,11 @@ def _bench(datasets, dataset_sizes, kernels, repeat=0, number=0, disable_tqdm=Fa
         res[i][j] = []
 
     for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
-        dataset_stmt = dataset.get('stmt')
+        dataset_stmt = dataset.stmt
         for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
             data = dataset_stmt(dataset_size)
             for k, kernel in enumerate(kernels):
-                kernel_stmt = kernel.get('stmt')
+                kernel_stmt = kernel.stmt
                 timer = timeit.Timer(stmt=lambda: kernel_stmt(data))
                 loops = number if number > 0 else ipython_utils.determine_number(timer)
 
@@ -61,6 +61,81 @@ class NotReadyError(Exception):
     pass
 
 
+class Dataset(object):
+    '''Dataset class.
+
+    Args:
+        stmt (function):
+        title (str):
+    '''
+    def __init__(self, *, stmt, title=None):
+        self._stmt = stmt
+        self._title = '' if title is None else title
+
+    @property
+    def stmt(self):
+        return self._stmt
+
+    @property
+    def title(self):
+        return self._title
+
+
+class Kernel(object):
+    '''Kernel class.
+
+    Args:
+        stmt (function):
+        label (str):
+    '''
+    def __init__(self, *, stmt, label=None):
+        self._stmt = stmt
+        self._label = '' if label is None else label
+
+    @property
+    def stmt(self):
+        return self._stmt
+
+    @property
+    def label(self):
+        return self._label
+
+
+class LayoutSize(object):
+    '''LayoutSize class.
+
+    Args:
+        width (int):
+        height (int):
+        label (str):
+    '''
+
+    def __init__(self, *, width=None, height=None, label=None):
+        if (width is None) or (width > 0):
+            self._width = width
+        else:
+            raise ValueError('`width` must be greater than 0.')
+
+        if (height is None) or (height > 0):
+            self._height = height
+        else:
+            raise ValueError('`height` must be greater than 0.')
+
+        self._label = '' if label is None else label
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def label(self):
+        return self._label
+
+
 class MeasurementMode(enum.Enum):
     '''Measurement mode.'''
     STANDARD = 1  #: Perform minimum value based measurements.
@@ -71,9 +146,9 @@ class Benchmark(object):
     '''This class measures execution speed of given code snippets.
 
     Args:
-        datasets (list(dict)):
+        datasets (list(:class:`Dataset`)):
         dataset_sizes (list(int)):
-        kernels (list(dict)):
+        kernels (list(:class:`Kernel`)):
         repeat (int): Number of times the measurement is repeated.
             When zero, this value is determined automatically.
         number (int): Number of loops to execute per measurement.
@@ -81,7 +156,7 @@ class Benchmark(object):
         measurement_mode (:class:`MeasurementMode`):
         xlabel (str): The text for a x-axis label.
         title (str): The title for a figure.
-        layout_sizes (list(dict)):
+        layout_sizes (list(:class:`LayoutSize`)):
     '''
     def __init__(
             self, *,
@@ -96,13 +171,11 @@ class Benchmark(object):
             layout_sizes=None
     ):
         self._datasets = datasets
-        _validators.validate_datasets(self._datasets)
 
         self._dataset_sizes = dataset_sizes
         _validators.validate_dataset_sizes(self._dataset_sizes)
 
         self._kernels = kernels
-        _validators.validate_kernels(self._kernels)
 
         if repeat >= 0:
             self._repeat = repeat
@@ -119,8 +192,7 @@ class Benchmark(object):
 
         self._layout_sizes = None
         if layout_sizes is not None:
-            self._layout_sizes = [dict(label='auto')] + layout_sizes
-            _validators.validate_layout_sizes(self._layout_sizes)
+            self._layout_sizes = [LayoutSize(label='auto')] + layout_sizes
 
         self._measurement_mode = measurement_mode
         self._figure = None
@@ -178,7 +250,7 @@ class Benchmark(object):
             updatemenus.append(
                 dict(
                     active=0,
-                    buttons=plotly_utils.make_layout_size_buttons(datasets=layout_sizes),
+                    buttons=plotly_utils.make_layout_size_buttons(layout_sizes=layout_sizes),
                     direction='down',
                     showactive=True,
                     x=pos_x,
@@ -224,7 +296,7 @@ class Benchmark(object):
         ndatasets = len(self._datasets)
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
-            name = self._kernels[i].get('label', '')
+            name = self._kernels[i].label
             color = self._color(index=i)
             for j, item in enumerate(result):
                 index = j + 1
@@ -232,7 +304,7 @@ class Benchmark(object):
                 y = [tres.best for tres in item]
 
                 if ndatasets > 1:
-                    title = self._datasets[j].get('title', '')
+                    title = self._datasets[j].title
                     suffix = ' - ' + title if title else ''
                 else:
                     suffix = ''
@@ -254,7 +326,7 @@ class Benchmark(object):
         ndatasets = len(self._datasets)
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
-            name = self._kernels[i].get('label', '')
+            name = self._kernels[i].label
             color = self._color(index=i)
             error_color = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.5,))
             for j, item in enumerate(result):
@@ -263,7 +335,7 @@ class Benchmark(object):
                 y = [tres.average for tres in item]
 
                 if ndatasets > 1:
-                    title = self._datasets[j].get('title', '')
+                    title = self._datasets[j].title
                     suffix = ' - ' + title if title else ''
                 else:
                     suffix = ''
@@ -291,7 +363,7 @@ class Benchmark(object):
         ndatasets = len(self._datasets)
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
-            name = self._kernels[i].get('label', '')
+            name = self._kernels[i].label
             color = self._color(index=i)
             for j, item in enumerate(result):
                 index = j + 1
@@ -299,7 +371,7 @@ class Benchmark(object):
                 y = [tres.average for tres in item]
 
                 if ndatasets > 1:
-                    title = self._datasets[j].get('title', '')
+                    title = self._datasets[j].title
                     suffix = ' - ' + title if title else ''
                 else:
                     suffix = ''
@@ -346,7 +418,7 @@ class Benchmark(object):
             rows=ndatasets,
             cols=1,
             shared_xaxes=True,
-            subplot_titles=[dataset.get('title', '') for dataset in self._datasets],
+            subplot_titles=[dataset.title for dataset in self._datasets],
             print_grid=False
         )
         fig = plotly.graph_objs.FigureWidget(subplots)

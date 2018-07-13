@@ -215,14 +215,14 @@ def make_scale_buttons(layout):
     return buttons
 
 
-def make_layout_size_buttons(datasets):
+def make_layout_size_buttons(layout_sizes):
     '''Make layout size buttons.'''
     buttons = []
 
-    for dataset in datasets:
-        label = dataset.get('label', '')
-        width = dataset.get('width')
-        height = dataset.get('height')
+    for layout_size in layout_sizes:
+        label = layout_size.label
+        width = layout_size.width
+        height = layout_size.height
 
         arg = dict(
             autosize=True if width is None or height is None else False,
