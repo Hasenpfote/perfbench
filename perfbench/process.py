@@ -49,7 +49,8 @@ def _bench(datasets, dataset_sizes, kernels, repeat=0, number=0, disable_tqdm=Fa
                     ipython_utils.TimeitResult(
                         loops=loops,
                         repeat=repeat,
-                        all_runs=all_runs
+                        all_runs=all_runs,
+                        precision=4
                     )
                 )
 
