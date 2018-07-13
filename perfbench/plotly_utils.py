@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 import itertools
+from collections import namedtuple
 
 
 try:
@@ -176,11 +177,12 @@ def make_subplot_buttons(layout):
 
 def make_scale_buttons(layout):
     '''Make scale buttons.'''
+    Dataset = namedtuple('Dataset', ('xtype', 'ytype', 'label'))
     datasets = [
-        dict(label='Linear', xtype='linear', ytype='linear'),
-        dict(label='Semilog-X', xtype='log', ytype='linear'),
-        dict(label='Semilog-Y', xtype='linear', ytype='log'),
-        dict(label='Log', xtype='log', ytype='log')
+        Dataset(xtype='linear', ytype='linear', label='Linear'),
+        Dataset(xtype='log', ytype='linear', label='Semilog-X'),
+        Dataset(xtype='linear', ytype='log', label='Semilog-Y'),
+        Dataset(xtype='log', ytype='log', label='Log')
     ]
 
     buttons = []
@@ -188,9 +190,9 @@ def make_scale_buttons(layout):
     combs = _find_axes_combs(layout)
 
     for dataset in datasets:
-        label = dataset.get('label')
-        xtype = dataset.get('xtype')
-        ytype = dataset.get('ytype')
+        xtype = dataset.xtype
+        ytype = dataset.ytype
+        label = dataset.label
 
         arg = {}
         for comb in combs:
