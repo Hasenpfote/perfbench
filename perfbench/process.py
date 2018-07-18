@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import time
 import timeit
 import itertools
 import math
@@ -25,7 +26,34 @@ except ImportError:
     tqdm = lambda x: x
 
 
-def _bench(datasets, dataset_sizes, kernels, repeat=0, number=0, disable_tqdm=False):
+def _autorange(timer, is_ns_timer=False):
+    '''Return the number of loops so that total time >= 0.2.'''
+    THRESHOLD = int(0.2 * 1.0e+9) if is_ns_timer else 0.2
+    i = 1
+    while True:
+        for j in 1, 2, 5:
+            number = i * j
+            time_taken = timer.timeit(number=number)
+            if time_taken >= THRESHOLD:
+                return number
+        i *= 10
+
+
+def _bench(
+        datasets,
+        dataset_sizes,
+        kernels,
+        repeat=0,
+        number=0,
+        disable_tqdm=False
+):
+    try:
+        timer = time.perf_counter_ns  # python >= 3.7
+        is_ns_timer = True
+    except AttributeError:
+        timer = time.perf_counter
+        is_ns_timer = False
+
     if repeat == 0:
         default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
         repeat = default_repeat
@@ -41,10 +69,12 @@ def _bench(datasets, dataset_sizes, kernels, repeat=0, number=0, disable_tqdm=Fa
             data = dataset_stmt(dataset_size)
             for k, kernel in enumerate(kernels):
                 kernel_stmt = kernel.stmt
-                timer = timeit.Timer(stmt=lambda: kernel_stmt(data))
-                loops = number if number > 0 else ipython_utils.determine_number(timer)
+                t = timeit.Timer(stmt=lambda: kernel_stmt(data), timer=timer)
+                loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
+                all_runs = t.repeat(repeat=repeat, number=loops)
+                if is_ns_timer:
+                    all_runs = [value * 1.0e-9 for value in all_runs]
 
-                all_runs = timer.repeat(repeat=repeat, number=loops)
                 res[k][i].append(
                     ipython_utils.TimeitResult(
                         loops=loops,

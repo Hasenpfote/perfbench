@@ -146,15 +146,3 @@ def _format_time(timespan, precision=3):
         order = 3
 
     return '{0:.{1}g} {2}'.format(timespan * scaling[order], precision, units[order])
-
-
-def determine_number(timer):
-    '''Determine number so that 0.2 <= total time < 2.0'''
-    number = 0
-    for index in range(0, 10):
-        number = 10 ** index
-        time_number = timer.timeit(number=number)
-        if time_number >= 0.2:
-            break
-
-    return number
