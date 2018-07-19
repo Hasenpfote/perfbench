@@ -197,3 +197,28 @@ class TestBenchmark(TestCase):
 
         with self.assertRaises(NotReadyError):
             bm.save_as_png(filepath='test.png')
+
+    def test_extra_args(self):
+        bm = Benchmark(
+            datasets=[
+                Dataset(
+                    stmt=lambda n: [i for i in range(n)],
+                    title='',
+                    extra_args=dict(
+                        foo=1,
+                        bar=2
+                    )
+                )
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                Kernel(
+                    stmt=lambda x, args: [value + args['foo'] + args['bar'] for value in x],
+                    label='add'
+                )
+            ],
+            xlabel='dataset sizes',
+            title='test'
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)

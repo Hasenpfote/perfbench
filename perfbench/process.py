@@ -65,11 +65,16 @@ def _bench(
 
     for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
         dataset_stmt = dataset.stmt
+        extra_args = dataset.extra_args
         for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
             data = dataset_stmt(dataset_size)
             for k, kernel in enumerate(kernels):
                 kernel_stmt = kernel.stmt
-                t = timeit.Timer(stmt=lambda: kernel_stmt(data), timer=timer)
+                if extra_args is None:
+                    t = timeit.Timer(stmt=lambda: kernel_stmt(data), timer=timer)
+                else:
+                    t = timeit.Timer(stmt=lambda: kernel_stmt(data, extra_args), timer=timer)
+
                 loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
                 all_runs = t.repeat(repeat=repeat, number=loops)
                 if is_ns_timer:
@@ -98,10 +103,13 @@ class Dataset(object):
     Args:
         stmt (function):
         title (str):
+        extra_args (dict): Extra arguments to pass to Kernel.
+            This parameter slightly affects measurement results.
     '''
-    def __init__(self, *, stmt, title=None):
+    def __init__(self, stmt, *, title=None, extra_args=None):
         self._stmt = stmt
         self._title = '' if title is None else title
+        self._extra_args = extra_args
 
     @property
     def stmt(self):
@@ -111,6 +119,10 @@ class Dataset(object):
     def title(self):
         return self._title
 
+    @property
+    def extra_args(self):
+        return self._extra_args
+
 
 class Kernel(object):
     '''Kernel class.
@@ -119,7 +131,7 @@ class Kernel(object):
         stmt (function):
         label (str):
     '''
-    def __init__(self, *, stmt, label=None):
+    def __init__(self, stmt, *, label=None):
         self._stmt = stmt
         self._label = '' if label is None else label
 
