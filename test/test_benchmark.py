@@ -34,7 +34,10 @@ class TestBenchmark(TestCase):
     def test_plot(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                ),
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -49,8 +52,14 @@ class TestBenchmark(TestCase):
 
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [int(i) for i in range(n)], title='int'),
-                Dataset(stmt=lambda n: [float(i) for i in range(n)], title='float')
+                Dataset(
+                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    title='int'
+                ),
+                Dataset(
+                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    title='float'
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -66,7 +75,10 @@ class TestBenchmark(TestCase):
     def test_plot_by_statistics(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -82,8 +94,14 @@ class TestBenchmark(TestCase):
 
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [int(i) for i in range(n)], title='int'),
-                Dataset(stmt=lambda n: [float(i) for i in range(n)], title='float')
+                Dataset(
+                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    title='int'
+                ),
+                Dataset(
+                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    title='float'
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -100,7 +118,10 @@ class TestBenchmark(TestCase):
     def test_save_as_html(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -117,7 +138,10 @@ class TestBenchmark(TestCase):
     def test_save_as_png(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -135,7 +159,10 @@ class TestBenchmark(TestCase):
     def test_layout_sizes(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -156,8 +183,14 @@ class TestBenchmark(TestCase):
 
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [int(i) for i in range(n)], title='int'),
-                Dataset(stmt=lambda n: [float(i) for i in range(n)], title='float')
+                Dataset(
+                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    title='int'
+                ),
+                Dataset(
+                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    title='float'
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -179,7 +212,10 @@ class TestBenchmark(TestCase):
     def test_results_are_not_ready(self):
         bm = Benchmark(
             datasets=[
-                Dataset(stmt=lambda n: [i for i in range(n)], title='')
+                Dataset(
+                    stmts=[lambda n: [i for i in range(n)], ],
+                    title=''
+                )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
@@ -202,7 +238,7 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmt=lambda n: [i for i in range(n)],
+                    stmts=[lambda n: [i for i in range(n)], ],
                     title='',
                     extra_args=dict(
                         foo=1,
@@ -216,6 +252,28 @@ class TestBenchmark(TestCase):
                     stmt=lambda x, args: [value + args['foo'] + args['bar'] for value in x],
                     label='add'
                 )
+            ],
+            xlabel='dataset sizes',
+            title='test'
+        )
+        bm.run(disable_tqdm=True)
+        bm.plot(auto_open=False)
+
+    def test_dataset_stmts(self):
+        bm = Benchmark(
+            datasets=[
+                Dataset(
+                    stmts=[
+                        lambda n: [+i for i in range(n)],  # for kernels[0]
+                        lambda n: [-i for i in range(n)],  # for kernels[1]
+                    ],
+                    title=''
+                )
+            ],
+            dataset_sizes=[2 ** n for n in range(2)],
+            kernels=[
+                Kernel(stmt=lambda x: x, label=''),
+                Kernel(stmt=lambda x: x, label='')
             ],
             xlabel='dataset sizes',
             title='test'

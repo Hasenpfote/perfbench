@@ -45,7 +45,7 @@ from perfbench.process import *
 bm = Benchmark(
     datasets=[
         Dataset(
-            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+            stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
             title='float64'
         )
     ],
@@ -79,15 +79,15 @@ from perfbench.process import *
 bm = Benchmark(
     datasets=[
         Dataset(
-            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16),
+            stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16), ],
             title='float16'
         ),
         Dataset(
-            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32),
+            stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32), ],
             title='float32'
         ),
         Dataset(
-            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+            stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
             title='float64'
         )
     ],
@@ -121,7 +121,7 @@ from perfbench.process import *
 bm = Benchmark(
     datasets=[
         Dataset(
-            stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+            stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
             title='float64'
         )
     ],

@@ -47,6 +47,22 @@ def _bench(
         number=0,
         disable_tqdm=False
 ):
+    '''Core process.
+
+    Args:
+        datasets (list(:class:`Dataset`)):
+        dataset_sizes (list(int)):
+        kernels (list(:class:`Kernel`)):
+        repeat (int): Number of times the measurement is repeated.
+            When zero, this value is determined automatically.
+        number (int): Number of loops to execute per measurement.
+            When zero, this value is determined automatically.
+        disable_tqdm (bool):
+
+    Returns:
+        Benchmark results.
+    '''
+    # select a performance counter.
     try:
         timer = time.perf_counter_ns  # python >= 3.7
         is_ns_timer = True
@@ -64,11 +80,20 @@ def _bench(
         res[i][j] = []
 
     for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
-        dataset_stmt = dataset.stmt
+        dataset_stmts = dataset.stmts
+        has_multiple = len(dataset_stmts) > 1
         extra_args = dataset.extra_args
+
         for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
-            data = dataset_stmt(dataset_size)
+            if has_multiple:
+                data_gen = (stmt(dataset_size) for stmt in dataset_stmts)
+            else:
+                data = dataset_stmts[0](dataset_size)
+
             for k, kernel in enumerate(kernels):
+                if has_multiple:
+                    data = next(data_gen)
+
                 kernel_stmt = kernel.stmt
                 if extra_args is None:
                     t = timeit.Timer(stmt=lambda: kernel_stmt(data), timer=timer)
@@ -101,19 +126,33 @@ class Dataset(object):
     '''Dataset class.
 
     Args:
-        stmt (function):
+        stmts (list): list of statement.
+        stmt (function): deprecated.
         title (str):
         extra_args (dict): Extra arguments to pass to Kernel.
             This parameter slightly affects measurement results.
     '''
-    def __init__(self, stmt, *, title=None, extra_args=None):
-        self._stmt = stmt
+    def __init__(self, stmts=None, *, stmt=None, title=None, extra_args=None):
+        if stmt is not None:
+            warnings.warn('`stmt` is deprecated. Use `stmts`.')
+            stmts = [stmt, ]
+
+        if not isinstance(stmts, list):
+            warnings.warn('This assignment has been deprecated. Please replace it with a `list`.')
+            stmts = [stmts, ]
+
+        self._stmts = stmts
         self._title = '' if title is None else title
         self._extra_args = extra_args
 
     @property
+    def stmts(self):
+        return self._stmts
+
+    @property
     def stmt(self):
-        return self._stmt
+        warnings.warn('`stmt` is deprecated. Use `stmts`.')
+        return self._stmts[0]
 
     @property
     def title(self):
@@ -213,6 +252,10 @@ class Benchmark(object):
             title=None,
             layout_sizes=None
     ):
+        for dataset in datasets:
+            if (len(dataset.stmts) > 1) and (len(dataset.stmts) != len(kernels)):
+                raise ValueError('`dataset.stmts` and `kernels` must be the same length.')
+
         self._datasets = datasets
 
         self._dataset_sizes = dataset_sizes

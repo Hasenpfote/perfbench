@@ -10,14 +10,14 @@ def main():
     bm = Benchmark(
         datasets=[
             Dataset(
-                stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+                stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
                 title='float64 to float32',
                 extra_args=dict(
                     dtype=np.float32
                 )
             ),
             Dataset(
-                stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32),
+                stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32), ],
                 title='float32 to float16',
                 extra_args=dict(
                     dtype=np.float16

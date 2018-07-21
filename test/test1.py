@@ -10,7 +10,7 @@ def main():
     bm = Benchmark(
         datasets=[
             Dataset(
-                stmt=lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+                stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
                 title='float64'
             )
         ],
