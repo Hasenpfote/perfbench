@@ -1,186 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import time
-import timeit
-import itertools
 import math
 import subprocess
 import json
 import warnings
 import enum
 import plotly
+from . import core
 from . import utils
-from . import ipython_utils
 from . import plotly_utils
 from . import _validators
-
-
-try:
-    if utils.is_interactive():
-        from tqdm import tqdm_notebook as tqdm
-    else:
-        from tqdm import tqdm
-
-except ImportError:
-    tqdm = lambda x: x
-
-
-def _autorange(timer, is_ns_timer=False):
-    '''Return the number of loops so that total time >= 0.2.'''
-    THRESHOLD = int(0.2 * 1.0e+9) if is_ns_timer else 0.2
-    i = 1
-    while True:
-        for j in 1, 2, 5:
-            number = i * j
-            time_taken = timer.timeit(number=number)
-            if time_taken >= THRESHOLD:
-                return number
-        i *= 10
-
-
-def _bench(
-        datasets,
-        dataset_sizes,
-        kernels,
-        repeat=0,
-        number=0,
-        disable_tqdm=False
-):
-    '''Core process.
-
-    Args:
-        datasets (list(:class:`Dataset`)):
-        dataset_sizes (list(int)):
-        kernels (list(:class:`Kernel`)):
-        repeat (int): Number of times the measurement is repeated.
-            When zero, this value is determined automatically.
-        number (int): Number of loops to execute per measurement.
-            When zero, this value is determined automatically.
-        disable_tqdm (bool):
-
-    Returns:
-        Benchmark results.
-    '''
-    # select a performance counter.
-    try:
-        timer = time.perf_counter_ns  # python >= 3.7
-        is_ns_timer = True
-    except AttributeError:
-        timer = time.perf_counter
-        is_ns_timer = False
-
-    if repeat == 0:
-        default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
-        repeat = default_repeat
-
-    shape = (len(kernels), len(datasets))
-    res = utils.create_empty_array_of_shape(shape)
-    for i, j in itertools.product(range(shape[0]), range(shape[1])):
-        res[i][j] = []
-
-    for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
-        dataset_stmts = dataset.stmts
-        has_multiple = len(dataset_stmts) > 1
-        extra_args = dataset.extra_args
-
-        for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
-            if has_multiple:
-                data_gen = (stmt(dataset_size) for stmt in dataset_stmts)
-            else:
-                data = dataset_stmts[0](dataset_size)
-
-            for k, kernel in enumerate(kernels):
-                if has_multiple:
-                    data = next(data_gen)
-
-                kernel_stmt = kernel.stmt
-                if extra_args is None:
-                    t = timeit.Timer(stmt=lambda: kernel_stmt(data), timer=timer)
-                else:
-                    t = timeit.Timer(stmt=lambda: kernel_stmt(data, extra_args), timer=timer)
-
-                loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
-                all_runs = t.repeat(repeat=repeat, number=loops)
-                if is_ns_timer:
-                    all_runs = [value * 1.0e-9 for value in all_runs]
-
-                res[k][i].append(
-                    ipython_utils.TimeitResult(
-                        loops=loops,
-                        repeat=repeat,
-                        all_runs=all_runs,
-                        precision=4
-                    )
-                )
-
-    return res
 
 
 class NotReadyError(Exception):
     '''Raised when a resource is not prepared.'''
     pass
-
-
-class Dataset(object):
-    '''Dataset class.
-
-    Args:
-        stmts (list): list of statement.
-        stmt (function): deprecated.
-        title (str):
-        extra_args (dict): Extra arguments to pass to Kernel.
-            This parameter slightly affects measurement results.
-    '''
-    def __init__(self, stmts=None, *, stmt=None, title=None, extra_args=None):
-        if stmt is not None:
-            warnings.warn('`stmt` is deprecated. Use `stmts`.')
-            stmts = [stmt, ]
-
-        if not isinstance(stmts, list):
-            warnings.warn('This assignment has been deprecated. Please replace it with a `list`.')
-            stmts = [stmts, ]
-
-        self._stmts = stmts
-        self._title = '' if title is None else title
-        self._extra_args = extra_args
-
-    @property
-    def stmts(self):
-        return self._stmts
-
-    @property
-    def stmt(self):
-        warnings.warn('`stmt` is deprecated. Use `stmts`.')
-        return self._stmts[0]
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def extra_args(self):
-        return self._extra_args
-
-
-class Kernel(object):
-    '''Kernel class.
-
-    Args:
-        stmt (function):
-        label (str):
-    '''
-    def __init__(self, stmt, *, label=None):
-        self._stmt = stmt
-        self._label = '' if label is None else label
-
-    @property
-    def stmt(self):
-        return self._stmt
-
-    @property
-    def label(self):
-        return self._label
 
 
 class LayoutSize(object):
@@ -253,8 +88,8 @@ class Benchmark(object):
             layout_sizes=None
     ):
         for dataset in datasets:
-            if (len(dataset.stmts) > 1) and (len(dataset.stmts) != len(kernels)):
-                raise ValueError('`dataset.stmts` and `kernels` must be the same length.')
+            if (len(dataset.factories) > 1) and (len(dataset.factories) != len(kernels)):
+                raise ValueError('`dataset.factories` and `kernels` must be the same length.')
 
         self._datasets = datasets
 
@@ -284,7 +119,7 @@ class Benchmark(object):
         self._figure = None
 
     def run(self, *, disable_tqdm=False):
-        results = _bench(
+        results = core.bench(
             datasets=self._datasets,
             dataset_sizes=self._dataset_sizes,
             kernels=self._kernels,

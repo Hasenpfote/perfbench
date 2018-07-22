@@ -3,35 +3,37 @@
 import numpy as np
 import sys
 sys.path.append('../')
-from perfbench.process import *
+from perfbench import *
 
 
 def main():
     bm = Benchmark(
         datasets=[
             Dataset(
-                stmts=[
+                factories=[
                     lambda n: np.random.uniform(low=0., high=1., size=n).astype(np.float64),  # for karnels[0]
                     lambda n: np.random.uniform(low=-1., high=0., size=n).astype(np.float64),  # for karnels[1]
                 ],
                 title='float64'
             ),
             Dataset(
-                stmts=[
+                factories=[
                     lambda n: np.random.uniform(low=0., high=1., size=n).astype(np.float32),  # for kernels[0]
                     lambda n: np.random.uniform(low=-1., high=0., size=n).astype(np.float32),  # for kernels[1]
                 ],
                 title='float32'
             )
         ],
-        dataset_sizes=[2 ** n for n in range(15)],
+        dataset_sizes=[2 ** n for n in range(10)],
         kernels=[
             Kernel(
-                stmt=lambda x: np.signbit(x),
+                stmt='np.signbit(DATASET)',
+                setup='import numpy as np',
                 label='signbit(pos)'
             ),
             Kernel(
-                stmt=lambda x: np.signbit(x),
+                stmt='np.signbit(DATASET)',
+                setup='import numpy as np',
                 label='signbit(neg)'
             ),
         ],

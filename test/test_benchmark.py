@@ -4,7 +4,7 @@ from unittest import TestCase
 import os
 import sys
 sys.path.append('../')
-from perfbench.process import *
+from perfbench import *
 
 
 class TestBenchmark(TestCase):
@@ -35,14 +35,22 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 ),
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test'
@@ -53,18 +61,28 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [int(i) for i in range(n)],
+                    ],
                     title='int'
                 ),
                 Dataset(
-                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [float(i) for i in range(n)],
+                    ],
                     title='float'
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test'
@@ -76,14 +94,22 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             measurement_mode=MeasurementMode.STATISTICS,
             xlabel='dataset sizes',
@@ -95,18 +121,28 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [int(i) for i in range(n)],
+                    ],
                     title='int'
                 ),
                 Dataset(
-                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [float(i) for i in range(n)],
+                    ],
                     title='float'
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             measurement_mode=MeasurementMode.STATISTICS,
             xlabel='dataset sizes',
@@ -119,14 +155,22 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test'
@@ -139,14 +183,22 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test'
@@ -160,14 +212,22 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test',
@@ -184,18 +244,28 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [int(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [int(i) for i in range(n)],
+                    ],
                     title='int'
                 ),
                 Dataset(
-                    stmts=[lambda n: [float(i) for i in range(n)], ],
+                    factories=[
+                        lambda n: [float(i) for i in range(n)],
+                    ],
                     title='float'
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
-                Kernel(stmt=lambda x: [value * 2 for value in x], label='multiply')
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
+                Kernel(
+                    stmt='[value * 2 for value in DATASET]',
+                    label='multiply'
+                )
             ],
             xlabel='dataset sizes',
             title='test',
@@ -213,13 +283,18 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title=''
                 )
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: [value + 2 for value in x], label='add'),
+                Kernel(
+                    stmt='[value + 2 for value in DATASET]',
+                    label='add'
+                ),
             ],
             xlabel='dataset sizes',
             title='test',
@@ -238,7 +313,9 @@ class TestBenchmark(TestCase):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[lambda n: [i for i in range(n)], ],
+                    factories=[
+                        lambda n: [i for i in range(n)],
+                    ],
                     title='',
                     extra_args=dict(
                         foo=1,
@@ -249,7 +326,7 @@ class TestBenchmark(TestCase):
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
                 Kernel(
-                    stmt=lambda x, args: [value + args['foo'] + args['bar'] for value in x],
+                    stmt="[value + EXTRA_ARGS['foo'] + EXTRA_ARGS['bar'] for value in DATASET]",
                     label='add'
                 )
             ],
@@ -259,11 +336,11 @@ class TestBenchmark(TestCase):
         bm.run(disable_tqdm=True)
         bm.plot(auto_open=False)
 
-    def test_dataset_stmts(self):
+    def test_dataset_factories(self):
         bm = Benchmark(
             datasets=[
                 Dataset(
-                    stmts=[
+                    factories=[
                         lambda n: [+i for i in range(n)],  # for kernels[0]
                         lambda n: [-i for i in range(n)],  # for kernels[1]
                     ],
@@ -272,8 +349,14 @@ class TestBenchmark(TestCase):
             ],
             dataset_sizes=[2 ** n for n in range(2)],
             kernels=[
-                Kernel(stmt=lambda x: x, label=''),
-                Kernel(stmt=lambda x: x, label='')
+                Kernel(
+                    stmt='DATASET',
+                    label=''
+                ),
+                Kernel(
+                    stmt='DATASET',
+                    label=''
+                ),
             ],
             xlabel='dataset sizes',
             title='test'

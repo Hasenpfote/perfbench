@@ -57,29 +57,33 @@ Usage
 .. code:: python
 
    import numpy as np
-   from perfbench.process import *
+   from perfbench import *
 
 
    bm = Benchmark(
        datasets=[
            Dataset(
-               stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
+               factories=[
+                   lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+               ],
                title='float64'
            )
        ],
        dataset_sizes=[2 ** n for n in range(26)],
        kernels=[
            Kernel(
-               stmt=lambda x: np.around(x),
+               stmt='np.around(DATASET)',
+               setup='import numpy as np',
                label='around'
            ),
            Kernel(
-               stmt=lambda x: np.rint(x),
+               stmt='np.rint(DATASET)',
+               setup='import numpy as np',
                label='rint'
            )
        ],
        xlabel='dataset sizes',
-       title='around vs rint'
+       title='around vs rint',
    )
    bm.run()
    bm.plot()
@@ -96,37 +100,45 @@ Usage
 .. code:: python
 
    import numpy as np
-   from perfbench.process import *
+   from perfbench import *
 
 
    bm = Benchmark(
        datasets=[
            Dataset(
-               stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16), ],
+               factories=[
+                   lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float16),
+               ],
                title='float16'
            ),
            Dataset(
-               stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32), ],
+               factories=[
+                   lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float32),
+               ],
                title='float32'
            ),
            Dataset(
-               stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
+               factories=[
+                   lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+               ],
                title='float64'
            )
        ],
        dataset_sizes=[2 ** n for n in range(26)],
        kernels=[
            Kernel(
-               stmt=lambda x: np.around(x),
+               stmt='np.around(DATASET)',
+               setup='import numpy as np',
                label='around'
            ),
            Kernel(
-               stmt=lambda x: np.rint(x),
+               stmt='np.rint(DATASET)',
+               setup='import numpy as np',
                label='rint'
            ),
        ],
        xlabel='dataset sizes',
-       title='around vs rint'
+       title='around vs rint',
    )
    bm.run()
    bm.plot()
@@ -146,24 +158,28 @@ Usage
 .. code:: python
 
    import numpy as np
-   from perfbench.process import *
+   from perfbench import *
 
 
    bm = Benchmark(
        datasets=[
            Dataset(
-               stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
+               factories=[
+                   lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+               ],
                title='float64'
            )
        ],
        dataset_sizes=[2 ** n for n in range(26)],
        kernels=[
            Kernel(
-               stmt=lambda x: np.around(x),
+               stmt='np.around(DATASET)',
+               setup='import numpy as np',
                label='around'
            ),
            Kernel(
-               stmt=lambda x: np.rint(x),
+               stmt='np.rint(DATASET)',
+               setup='import numpy as np',
                label='rint'
            )
        ],

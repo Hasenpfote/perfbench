@@ -3,25 +3,29 @@
 import numpy as np
 import sys
 sys.path.append('../')
-from perfbench.process import *
+from perfbench import *
 
 
 def main():
     bm = Benchmark(
         datasets=[
             Dataset(
-                stmts=[lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64), ],
+                factories=[
+                    lambda n: np.random.uniform(low=-1., high=1., size=n).astype(np.float64),
+                ],
                 title='float64'
             )
         ],
         dataset_sizes=[2 ** n for n in range(3)],
         kernels=[
             Kernel(
-                stmt=lambda x: np.around(x),
+                stmt='np.around(DATASET)',
+                setup='import numpy as np',
                 label='around'
             ),
             Kernel(
-                stmt=lambda x: np.rint(x),
+                stmt='np.rint(DATASET)',
+                setup='import numpy as np',
                 label='rint'
             )
         ],
