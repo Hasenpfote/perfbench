@@ -5,6 +5,7 @@ import timeit
 import itertools
 from . import utils
 from . import ipython_utils
+from ._core_validators import validate
 
 
 try:
@@ -77,7 +78,8 @@ def bench(
         kernels,
         repeat=0,
         number=0,
-        disable_tqdm=False
+        disable_tqdm=False,
+        enable_validation=True
 ):
     '''Core process.
 
@@ -90,10 +92,20 @@ def bench(
         number (int): Number of loops to execute per measurement.
             When zero, this value is determined automatically.
         disable_tqdm (bool):
+        enable_validation (bool):
 
     Returns:
         Benchmark results.
     '''
+    if enable_validation:
+        validate(
+            datasets=datasets,
+            dataset_sizes=dataset_sizes,
+            kernels=kernels,
+            repeat=repeat,
+            number=number
+        )
+
     # select a performance counter.
     try:
         timer = time.perf_counter_ns  # python >= 3.7

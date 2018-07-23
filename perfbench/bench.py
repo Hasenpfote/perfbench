@@ -10,7 +10,7 @@ import plotly
 from . import core
 from . import utils
 from . import plotly_utils
-from . import _validators
+from ._bench_validators import validate
 
 
 class NotReadyError(Exception):
@@ -122,27 +122,11 @@ class Benchmark(object):
             title=None,
             layout_sizes=None
     ):
-        for dataset in datasets:
-            if (len(dataset.factories) > 1) and (len(dataset.factories) != len(kernels)):
-                raise ValueError('`dataset.factories` and `kernels` must be the same length.')
-
         self._datasets = datasets
-
         self._dataset_sizes = dataset_sizes
-        _validators.validate_dataset_sizes(self._dataset_sizes)
-
         self._kernels = kernels
-
-        if repeat >= 0:
-            self._repeat = repeat
-        else:
-            raise ValueError('`repeat` must be greater than or equal to 0.')
-
-        if number >= 0:
-            self._number = number
-        else:
-            raise ValueError('`number` must be greater than or equal to 0.')
-
+        self._repeat = repeat
+        self._number = number
         self._xlabel = '' if xlabel is None else xlabel
         self._title = '' if title is None else title
 
@@ -153,6 +137,15 @@ class Benchmark(object):
         self._measurement_mode = measurement_mode
         self._figure = None
 
+        validate(
+            datasets=self._datasets,
+            dataset_sizes=self._dataset_sizes,
+            kernels=self._kernels,
+            repeat=self._repeat,
+            number=self._number,
+            layout_sizes=self._layout_sizes
+        )
+
     def run(self, *, disable_tqdm=False):
         results = core.bench(
             datasets=self._datasets,
@@ -160,7 +153,8 @@ class Benchmark(object):
             kernels=self._kernels,
             repeat=self._repeat,
             number=self._number,
-            disable_tqdm=disable_tqdm
+            disable_tqdm=disable_tqdm,
+            enable_validation=False
         )
         self._figure = self._create_figure(benchmark_results=results)
 
