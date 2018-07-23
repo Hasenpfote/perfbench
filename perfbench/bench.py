@@ -18,6 +18,41 @@ class NotReadyError(Exception):
     pass
 
 
+class Dataset(core.Dataset):
+    '''Dataset class.
+
+    Args:
+        factories (list):
+        extra_args (dict): Extra arguments to pass to Kernel.
+            This parameter slightly affects measurement results.
+        title (str):
+    '''
+    def __init__(self, factories, *, extra_args=None, title=None):
+        super().__init__(factories, extra_args=extra_args)
+        self._title = '' if title is None else title
+
+    @property
+    def title(self):
+        return self._title
+
+
+class Kernel(core.Kernel):
+    '''Kernel class.
+
+    Args:
+        stmt:
+        setup:
+        label (str):
+    '''
+    def __init__(self, stmt='pass', setup='pass', label=None):
+        super().__init__(stmt=stmt, setup=setup)
+        self._label = '' if label is None else label
+
+    @property
+    def label(self):
+        return self._label
+
+
 class LayoutSize(object):
     '''LayoutSize class.
 

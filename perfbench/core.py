@@ -24,12 +24,10 @@ class Dataset(object):
         factories (list):
         extra_args (dict): Extra arguments to pass to Kernel.
             This parameter slightly affects measurement results.
-        title (str):
     '''
-    def __init__(self, factories, *, extra_args=None, title=None):
+    def __init__(self, factories, *, extra_args=None):
         self._factories = factories
         self._extra_args = extra_args
-        self._title = '' if title is None else title
 
     @property
     def factories(self):
@@ -39,10 +37,6 @@ class Dataset(object):
     def extra_args(self):
         return self._extra_args
 
-    @property
-    def title(self):
-        return self._title
-
 
 class Kernel(object):
     '''Kernel class.
@@ -50,12 +44,10 @@ class Kernel(object):
     Args:
         stmt:
         setup:
-        label (str):
     '''
-    def __init__(self, stmt='pass', setup='pass', label=None):
+    def __init__(self, stmt='pass', setup='pass'):
         self._stmt = stmt
         self._setup = setup
-        self._label = '' if label is None else label
 
     @property
     def stmt(self):
@@ -64,10 +56,6 @@ class Kernel(object):
     @property
     def setup(self):
         return self._setup
-
-    @property
-    def label(self):
-        return self._label
 
 
 def _autorange(timer, is_ns_timer=False):
