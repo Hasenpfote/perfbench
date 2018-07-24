@@ -364,13 +364,18 @@ class Benchmark(object):
     def _create_figure(self, *, benchmark_results):
         '''Create a figure with multiple subplots.'''
         ndatasets = len(self._datasets)
-        subplots = plotly.tools.make_subplots(
-            rows=ndatasets,
-            cols=1,
-            shared_xaxes=True,
-            subplot_titles=[dataset.title for dataset in self._datasets],
-            print_grid=False
-        )
+
+        # Suppress warnings temporarily.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            subplots = plotly.tools.make_subplots(
+                rows=ndatasets,
+                cols=1,
+                shared_xaxes=True,
+                subplot_titles=[dataset.title for dataset in self._datasets],
+                print_grid=False
+            )
+
         fig = plotly.graph_objs.FigureWidget(subplots)
 
         if self._measurement_mode == MeasurementMode.STANDARD:
