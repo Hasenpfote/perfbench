@@ -4,8 +4,8 @@ import time
 import timeit
 import itertools
 import gc
+import math
 from . import utils
-from . import ipython_utils
 from ._core_validators import validate
 
 
@@ -58,6 +58,122 @@ class Kernel(object):
     @property
     def setup(self):
         return self._setup
+
+
+class TimeitResult(object):
+    '''This class stores a result of Timeit.
+
+    Args:
+        loops (int): Number of loops done per measurement.
+        repeat (int): Number of times the measurement has been repeated.
+        all_runs (list(float)): Execution time of each run (in seconds).
+        precision: number of significant digits.
+    '''
+    def __init__(self, *, loops, repeat, all_runs, precision=3):
+        self._loops = loops
+        self._repeat = repeat
+        self._best = min(all_runs) / loops
+        self._worst = max(all_runs) / loops
+
+        timings = [dt / loops for dt in all_runs]
+        self._average = math.fsum(timings) / len(timings)
+        self._stdev = math.sqrt(math.fsum([(x - self._average) ** 2 for x in timings]) / len(timings))
+
+        self._precision = precision
+
+    @property
+    def loops(self):
+        return self._loops
+
+    @property
+    def repeat(self):
+        return self._repeat
+
+    @property
+    def best(self):
+        return self._best
+
+    @property
+    def worst(self):
+        return self._worst
+
+    @property
+    def average(self):
+        return self._average
+
+    @property
+    def stdev(self):
+        return self._stdev
+
+    def is_reliable(self):
+        return self._worst < self._best * 4
+
+    def report_standard_info(self):
+        '''Reports standard information.'''
+        fmt = '{loops} loops, best of {runs}: {best} per loop'
+        return fmt.format(
+            loops=self.loops,
+            runs=self.repeat,
+            best=_format_time(timespan=self.best, precision=self._precision)
+        )
+
+    def report_statistical_info(self):
+        '''Reports statistical information.'''
+        fmt = '{mean} {pm} {stdev} per loop (mean {pm} s.d. of {runs} run{run_plural}, {loops} loop{loop_plural} each)'
+        return fmt.format(
+            mean=_format_time(timespan=self.average, precision=self._precision),
+            pm='\xb1',
+            stdev=_format_time(timespan=self.stdev, precision=self._precision),
+            runs=self.repeat,
+            run_plural='s' if self.repeat > 1 else '',
+            loops=self.loops,
+            loop_plural='s' if self.loops > 1 else ''
+        )
+
+
+def _seconds_to_hrf(seconds, *, separator=' '):
+    '''Convert seconds to human readable format.
+
+    Args:
+        seconds (int): seconds to convert.
+        separator (str): separator.
+
+    Returns:
+        str: Human readable format.
+    '''
+    parts = [
+        ('w', 60 * 60 * 24 * 7),
+        ('d', 60 * 60 * 24),
+        ('h', 60 * 60),
+        ('m', 60),
+        ('s', 1)
+    ]
+
+    time = []
+    leftover = seconds
+    for suffix, length in parts:
+        value = int(leftover / length)
+        if value > 0:
+            leftover %= length
+            time.append('{}{}'.format(str(value), suffix))
+        if leftover < 1:
+            break
+
+    return separator.join(time)
+
+
+def _format_time(timespan, precision=3):
+    if timespan > 60.0:
+        return _seconds_to_hrf(timespan)
+
+    units = ('s', 'ms', '\xb5s', 'ns')
+    scaling = (1, 1e+3, 1e+6, 1e+9)
+    if timespan > 0.0:
+        order = min(max(-int(math.floor(math.log10(timespan)) // 3), 0), 3)
+    else:
+        order = 3
+
+    return '{0:.{1}g} {2}'.format(timespan * scaling[order], precision, units[order])
 
 
 def _autorange(timer, is_ns_timer=False):
@@ -158,7 +274,7 @@ def bench(
                     all_runs = [value * 1.0e-9 for value in all_runs]
 
                 res[k][i].append(
-                    ipython_utils.TimeitResult(
+                    TimeitResult(
                         loops=loops,
                         repeat=repeat,
                         all_runs=all_runs,
