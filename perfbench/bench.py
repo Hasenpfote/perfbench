@@ -109,6 +109,8 @@ class Benchmark(object):
         xlabel (str): The text for a x-axis label.
         title (str): The title for a figure.
         layout_sizes (list(:class:`LayoutSize`)):
+        force_gc (bool): True if force garbage collection immediately
+            after generating data False otherwise.
     '''
     def __init__(
             self, *,
@@ -120,7 +122,8 @@ class Benchmark(object):
             measurement_mode=MeasurementMode.STANDARD,
             xlabel=None,
             title=None,
-            layout_sizes=None
+            layout_sizes=None,
+            force_gc=True
     ):
         self._datasets = datasets
         self._dataset_sizes = dataset_sizes
@@ -134,6 +137,7 @@ class Benchmark(object):
         if layout_sizes is not None:
             self._layout_sizes = [LayoutSize(label='auto')] + layout_sizes
 
+        self._force_gc = force_gc
         self._measurement_mode = measurement_mode
         self._figure = None
 
@@ -154,7 +158,8 @@ class Benchmark(object):
             repeat=self._repeat,
             number=self._number,
             disable_tqdm=disable_tqdm,
-            enable_validation=False
+            enable_validation=False,
+            force_gc=self._force_gc
         )
         self._figure = self._create_figure(benchmark_results=results)
 

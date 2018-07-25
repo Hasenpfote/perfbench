@@ -3,6 +3,7 @@
 import time
 import timeit
 import itertools
+import gc
 from . import utils
 from . import ipython_utils
 from ._core_validators import validate
@@ -79,7 +80,8 @@ def bench(
         repeat=0,
         number=0,
         disable_tqdm=False,
-        enable_validation=True
+        enable_validation=True,
+        force_gc=True
 ):
     '''Core process.
 
@@ -93,6 +95,8 @@ def bench(
             When zero, this value is determined automatically.
         disable_tqdm (bool):
         enable_validation (bool):
+        force_gc (bool): True if force garbage collection immediately
+            after generating data False otherwise.
 
     Returns:
         Benchmark results.
@@ -136,10 +140,14 @@ def bench(
                 data_gen = (factory(dataset_size) for factory in dataset.factories)
             else:
                 DATASET = dataset.factories[0](dataset_size)
+                if force_gc:
+                    gc.collect()
 
             for k, kernel in enumerate(kernels):
                 if has_multiple:
                     DATASET = next(data_gen)
+                    if force_gc:
+                        gc.collect()
 
                 setup = SETUP + '\n' + kernel.setup
                 t = timeit.Timer(stmt=kernel.stmt, setup=setup, timer=timer)
