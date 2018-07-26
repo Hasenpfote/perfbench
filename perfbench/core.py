@@ -108,6 +108,18 @@ class TimeitResult(object):
     def is_reliable(self):
         return self._worst < self._best * 4
 
+    def warning_message(self):
+        if self.is_reliable():
+            return ''
+
+        fmt = 'The test results are likely unreliable.\n' \
+              'The worst time {worst} was more than four times slower than the best time {best}.'
+
+        return fmt.format(
+            worst=_format_time(timespan=self._worst, precision=self._precision),
+            best=_format_time(timespan=self._best, precision=self._precision)
+        )
+
     def report_standard_info(self):
         '''Reports standard information.'''
         fmt = '{loops} loops, best of {runs}: {best} per loop'

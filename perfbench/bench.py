@@ -313,56 +313,31 @@ class Benchmark(object):
                 )
                 figure.add_trace(trace, row=index, col=1)
 
-    def _add_average_traces(self, *, figure, benchmark_results):
-        '''Add average_traces.'''
-        ndatasets = len(self._datasets)
+    def _add_warning_traces(self, *, figure, benchmark_results):
         for i, result in enumerate(benchmark_results):
             legendgroup = str(i)
-            name = self._kernels[i].label
-            color = self._color(index=i)
             for j, item in enumerate(result):
                 index = j + 1
                 x = self._dataset_sizes
-                y = [tres.average for tres in item]
-
-                if ndatasets > 1:
-                    title = self._datasets[j].title
-                    suffix = ' - ' + title if title else ''
+                if self._measurement_mode == MeasurementMode.STANDARD:
+                    y = [tres.best for tres in item]
                 else:
-                    suffix = ''
+                    y = [tres.average for tres in item]
 
+                indices = [i for i, tres in enumerate(item) if not tres.is_reliable()]
                 trace = plotly.graph_objs.Scatter(
-                    x=x,
-                    y=y,
-                    name=name + suffix,
-                    text=[tres.__str__() for tres in item],
-                    hoverinfo='x+text+name',
-                    showlegend=True,
-                    legendgroup=legendgroup,
-                    line=dict(color=color),
-                )
-                figure.add_trace(trace, row=index, col=1)
-
-    def _add_stdev_traces(self, *, figure, benchmark_results):
-        '''Add stdev traces.'''
-        for i, result in enumerate(benchmark_results):
-            legendgroup = str(i)
-            color = self._color(index=i)
-            for j, item in enumerate(result):
-                index = j + 1
-                x = self._dataset_sizes
-                y = [tres.average for tres in item]
-                fillcolor = self._label_rgba(colors=plotly.colors.unlabel_rgb(color) + (0.1,))
-                fx, fy = self._calc_filled_line(x=x, y=y, delta=[tres.stdev for tres in item])
-                trace = plotly.graph_objs.Scatter(
-                    x=fx,
-                    y=fy,
-                    hoverinfo='x',
+                    x=[x[index] for index in indices],
+                    y=[y[index] for index in indices],
+                    text=[item[index].warning_message().replace('\n', '<br />') for index in indices],
+                    hoverinfo='x+text',
                     showlegend=False,
                     legendgroup=legendgroup,
-                    line=dict(color='rgba(255,255,255,0)'),
-                    fill='tozerox',
-                    fillcolor=fillcolor
+                    mode='markers',
+                    marker=dict(
+                        size=10,
+                        color='rgb(255,0,0)',
+                        symbol='x-open'
+                    )
                 )
                 figure.add_trace(trace, row=index, col=1)
 
@@ -387,8 +362,8 @@ class Benchmark(object):
             self._add_standard_traces(figure=fig, benchmark_results=benchmark_results)
         else:
             self._add_statistical_traces(figure=fig, benchmark_results=benchmark_results)
-            #self._add_average_traces(figure=fig, benchmark_results=benchmark_results)
-            #self._add_stdev_traces(figure=fig, benchmark_results=benchmark_results)
+
+        self._add_warning_traces(figure=fig, benchmark_results=benchmark_results)
 
         # update the layout.
         layout = fig.layout
