@@ -214,6 +214,10 @@ Usage
    # same as above
    bm.save_as_png(filepath='/path/to/file', width=1280, height=960)
 
+| **Other**
+| `Here <https://github.com/Hasenpfote/perfbench/tree/master/example>`__
+  are a few examples.
+
 License
 -------
 
