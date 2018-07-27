@@ -6,7 +6,7 @@ perfbench
 =========
 
 ## About
-perfbench is a perfomance benchmarking module for Python code.
+perfbench measures execution time of code snippets with Timeit and uses Plotly to visualize the results. 
 
 ## Feature
 * It is possible to select measurement modes.
