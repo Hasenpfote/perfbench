@@ -11,26 +11,18 @@ def get_version():
                          version_file.read()).group('version')
 
 
-def _load_requirements_from_file(filepath):
-    with open(filepath, 'r') as f:
-        return [line.strip() for line in f.readlines()]
-
-
-def _install_requires():
-    return _load_requirements_from_file('requirements.txt')
-
-
-def _tests_require():
-    return _load_requirements_from_file('requirements-test.txt')
-
-
-def _doc_require():
-    return _load_requirements_from_file('requirements-doc.txt')
-
-
 def _long_description():
     with open('README.rst', 'r') as f:
         return f.read()
+
+
+required=[
+    'tqdm>=4.6.1',
+    'Cerberus>=1.1',
+    'plotly>=3.0.0',
+    'notebook>=5.3',
+    'ipywidgets>=7.2',
+]
 
 
 if __name__ == '__main__':
@@ -60,11 +52,5 @@ if __name__ == '__main__':
             'Topic :: Utilities'
         ],
         python_requires='>=3.4',
-        install_requires=_install_requires(),
-        tests_require=_tests_require(),
-        #test_suite='nose.collector',
-        extras_require = {
-            'test': _tests_require(),
-            'doc': _doc_require(),
-        },
+        install_requires=required,
     )

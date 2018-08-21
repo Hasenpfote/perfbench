@@ -4,3 +4,7 @@
 /perfbench.egg-info
 /temp
 /sphinx
+/.tox
+/cover
+.coverage
+.noseids
