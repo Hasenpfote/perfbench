@@ -1,6 +1,7 @@
 `License <https://github.com/Hasenpfote/fpq/blob/master/LICENSE>`__
 `Build Status <https://travis-ci.org/Hasenpfote/perfbench>`__ `PyPI
 version <https://badge.fury.io/py/perfbench>`__
+`Pyversions <https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat>`__
 
 perfbench
 =========
@@ -28,12 +29,11 @@ Feature
 Compatibility
 -------------
 
-perfbench works with Python 3.3 or higher.
+perfbench works with Python 3.4 or higher.
 
 Dependencies
 ------------
 
--  `enum34 <https://pypi.org/project/enum34/>`__
 -  `tqdm <https://github.com/tqdm/tqdm>`__\ (4.6.1 or higher.)
 -  `cerberus <https://github.com/pyeve/cerberus>`__\ (1.1 or higher.)
 -  `plotly <https://github.com/plotly/plotly.py>`__\ (3.0.0 or higher)

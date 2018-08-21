@@ -1,6 +1,7 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Hasenpfote/fpq/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/Hasenpfote/perfbench.svg?branch=master)](https://travis-ci.org/Hasenpfote/perfbench)
 [![PyPI version](https://badge.fury.io/py/perfbench.svg)](https://badge.fury.io/py/perfbench)
+[![Pyversions](https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat)](https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat)
 
 perfbench
 =========
@@ -19,10 +20,9 @@ perfbench measures execution time of code snippets with Timeit and uses Plotly t
 **When not to use the function, you do not need to install orca separately.**
 
 ## Compatibility
-perfbench works with Python 3.3 or higher.
+perfbench works with Python 3.4 or higher.
 
 ## Dependencies
-* [enum34](https://pypi.org/project/enum34/)
 * [tqdm](https://github.com/tqdm/tqdm)(4.6.1 or higher.)
 * [cerberus](https://github.com/pyeve/cerberus)(1.1 or higher.)
 * [plotly](https://github.com/plotly/plotly.py)(3.0.0 or higher)
