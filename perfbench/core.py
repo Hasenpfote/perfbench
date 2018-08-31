@@ -272,18 +272,18 @@ def bench(
         is_ns_timer = False
 
     if repeat == 0:
-        default_repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
-        repeat = default_repeat
+        repeat = 7 if timeit.default_repeat < 7 else timeit.default_repeat
 
     shape = (len(kernels), len(datasets))
     res = utils.create_empty_array_of_shape(shape)
     for i, j in itertools.product(range(shape[0]), range(shape[1])):
         res[i][j] = []
 
-    input = dict(DATASET=None, EXTRA_ARGS=None)
-    with apply_to_globals_temporarily(input):
+    applicable_items = dict(DATASET=None, EXTRA_ARGS=None)
+    with apply_to_globals_temporarily(applicable_items):
         global DATASET, EXTRA_ARGS
-        SETUP = 'from {} import DATASET, EXTRA_ARGS'.format(__name__)
+
+        minimum_setup = 'from {} import DATASET, EXTRA_ARGS'.format(__name__)
 
         for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
             has_multiple = len(dataset.factories) > 1
@@ -303,13 +303,15 @@ def bench(
                         if force_gc:
                             gc.collect()
 
-                    setup = SETUP + '\n' + kernel.setup
+                    setup = minimum_setup + '\n' + kernel.setup
                     t = timeit.Timer(stmt=kernel.stmt, setup=setup, timer=timer)
 
                     loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
                     all_runs = t.repeat(repeat=repeat, number=loops)
                     if is_ns_timer:
-                        all_runs = [value * 1.0e-9 for value in all_runs]
+                        #all_runs = [value * 1.0e-9 for value in all_runs]
+                        for index, _ in enumerate(all_runs):
+                            all_runs[index] *= 1.0e-9
 
                     res[k][i].append(
                         TimeitResult(
