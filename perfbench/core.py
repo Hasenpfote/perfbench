@@ -5,6 +5,7 @@ import timeit
 import itertools
 import gc
 import math
+import contextlib
 from . import utils
 from ._core_validators import validate
 
@@ -201,6 +202,30 @@ def _autorange(timer, is_ns_timer=False):
         i *= 10
 
 
+@contextlib.contextmanager
+def apply_to_globals_temporarily(items):
+    '''Apply to globals temporarily.
+
+    Args:
+        items (dict):
+    '''
+    globals_ = globals()
+
+    unique_items = dict()
+    for key in items.keys() - globals_.keys():
+        unique_items[key] = items[key]
+
+    if unique_items:
+        globals_.update(unique_items)
+
+    try:
+        yield
+    finally:
+        # Restore.
+        for key in unique_items.keys():
+            globals_.pop(key, None)
+
+
 def bench(
         datasets,
         dataset_sizes,
@@ -255,46 +280,44 @@ def bench(
     for i, j in itertools.product(range(shape[0]), range(shape[1])):
         res[i][j] = []
 
-    globals().update({'DATASET': None, 'EXTRA_ARGS': None})
-    global DATASET, EXTRA_ARGS
-    SETUP = 'from {} import DATASET, EXTRA_ARGS'.format(__name__)
+    input = dict(DATASET=None, EXTRA_ARGS=None)
+    with apply_to_globals_temporarily(input):
+        global DATASET, EXTRA_ARGS
+        SETUP = 'from {} import DATASET, EXTRA_ARGS'.format(__name__)
 
-    for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
-        has_multiple = len(dataset.factories) > 1
-        EXTRA_ARGS = dataset.extra_args
+        for i, dataset in enumerate(tqdm(datasets, disable=disable_tqdm)):
+            has_multiple = len(dataset.factories) > 1
+            EXTRA_ARGS = dataset.extra_args
 
-        for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
-            if has_multiple:
-                data_gen = (factory(dataset_size) for factory in dataset.factories)
-            else:
-                DATASET = dataset.factories[0](dataset_size)
-                if force_gc:
-                    gc.collect()
-
-            for k, kernel in enumerate(kernels):
+            for j, dataset_size in enumerate(tqdm(dataset_sizes, disable=disable_tqdm)):
                 if has_multiple:
-                    DATASET = next(data_gen)
+                    data_gen = (factory(dataset_size) for factory in dataset.factories)
+                else:
+                    DATASET = dataset.factories[0](dataset_size)
                     if force_gc:
                         gc.collect()
 
-                setup = SETUP + '\n' + kernel.setup
-                t = timeit.Timer(stmt=kernel.stmt, setup=setup, timer=timer)
+                for k, kernel in enumerate(kernels):
+                    if has_multiple:
+                        DATASET = next(data_gen)
+                        if force_gc:
+                            gc.collect()
 
-                loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
-                all_runs = t.repeat(repeat=repeat, number=loops)
-                if is_ns_timer:
-                    all_runs = [value * 1.0e-9 for value in all_runs]
+                    setup = SETUP + '\n' + kernel.setup
+                    t = timeit.Timer(stmt=kernel.stmt, setup=setup, timer=timer)
 
-                res[k][i].append(
-                    TimeitResult(
-                        loops=loops,
-                        repeat=repeat,
-                        all_runs=all_runs,
-                        precision=4
+                    loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
+                    all_runs = t.repeat(repeat=repeat, number=loops)
+                    if is_ns_timer:
+                        all_runs = [value * 1.0e-9 for value in all_runs]
+
+                    res[k][i].append(
+                        TimeitResult(
+                            loops=loops,
+                            repeat=repeat,
+                            all_runs=all_runs,
+                            precision=4
+                        )
                     )
-                )
-
-    globals().pop('DATASET', None)
-    globals().pop('EXTRA_ARGS', None)
 
     return res
