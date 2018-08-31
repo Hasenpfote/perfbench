@@ -309,7 +309,6 @@ def bench(
                     loops = number if number > 0 else _autorange(timer=t, is_ns_timer=is_ns_timer)
                     all_runs = t.repeat(repeat=repeat, number=loops)
                     if is_ns_timer:
-                        #all_runs = [value * 1.0e-9 for value in all_runs]
                         for index, _ in enumerate(all_runs):
                             all_runs[index] *= 1.0e-9
 
