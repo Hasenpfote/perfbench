@@ -1,7 +1,4 @@
-`License <https://github.com/Hasenpfote/fpq/blob/master/LICENSE>`__
-`Build Status <https://travis-ci.org/Hasenpfote/perfbench>`__ `PyPI
-version <https://badge.fury.io/py/perfbench>`__
-`Pyversions <https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat>`__
+|License| |Build Status| |PyPI version| |Pyversions|
 
 perfbench
 =========
@@ -20,16 +17,15 @@ Feature
 -  It is possible to switch between axes scales dynamically.
 -  It is possible to switch between subplots dynamically.
 -  The result of the benchmark can be saved locally as a html.
--  The result of the benchmark can be saved locally as a png.
-   **Requires installation
-   of**\ `orca <https://github.com/plotly/orca>`__\ **.**
+-  The result of the benchmark can be saved locally as a png. **Requires
+   installation of**\ `orca <https://github.com/plotly/orca>`__\ **.**
    **When not to use the function, you do not need to install orca
    separately.**
 
 Compatibility
 -------------
 
-perfbench works with Python 3.4 or higher.
+perfbench works with Python 3.5 or higher.
 
 Dependencies
 ------------
@@ -37,7 +33,7 @@ Dependencies
 -  `tqdm <https://github.com/tqdm/tqdm>`__\ (4.6.1 or higher.)
 -  `cerberus <https://github.com/pyeve/cerberus>`__\ (1.1 or higher.)
 -  `plotly <https://github.com/plotly/plotly.py>`__\ (3.0.0 or higher)
--  `notebook <https://github.com/jupyter/notebook>`__\ (5.3 or higher.)
+-  `notebook <https://github.com/jupyter/notebook>`__\ (6.0 or higher.)
 -  `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`__\ (7.2
    or higher.)
 
@@ -51,9 +47,9 @@ Installation
 Usage
 -----
 
-| **Plotting a single figure.**
-| `Here <https://plot.ly/~Hasenpfote/8/perfbench-demo1/>`__ is the
-  demonstration.
+**Plotting a single figure.**
+`Here <https://plot.ly/~Hasenpfote/8/perfbench-demo1/>`__ is the
+demonstration.
 
 .. code:: python
 
@@ -94,9 +90,9 @@ Usage
 
    plot1
 
-| **Plotting multiple plots on a single figure.**
-| `Here <https://plot.ly/~Hasenpfote/9/perfbench-demo2/>`__ is the
-  demonstration.
+**Plotting multiple plots on a single figure.**
+`Here <https://plot.ly/~Hasenpfote/9/perfbench-demo2/>`__ is the
+demonstration.
 
 .. code:: python
 
@@ -215,11 +211,20 @@ Usage
    # same as above
    bm.save_as_png(filepath='/path/to/file', width=1280, height=960)
 
-| **Other**
-| `Here <https://github.com/Hasenpfote/perfbench/tree/master/example>`__
-  are a few examples.
+**Other**
+`Here <https://github.com/Hasenpfote/perfbench/tree/master/example>`__
+are a few examples.
 
 License
 -------
 
 This software is released under the MIT License, see LICENSE.
+
+.. |License| image:: https://img.shields.io/badge/license-MIT-brightgreen.svg
+   :target: https://github.com/Hasenpfote/fpq/blob/master/LICENSE
+.. |Build Status| image:: https://travis-ci.com/Hasenpfote/perfbench.svg?branch=master
+   :target: https://travis-ci.com/Hasenpfote/perfbench
+.. |PyPI version| image:: https://badge.fury.io/py/perfbench.svg
+   :target: https://badge.fury.io/py/perfbench
+.. |Pyversions| image:: https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat
+   :target: https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat

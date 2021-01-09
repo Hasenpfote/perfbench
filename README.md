@@ -20,13 +20,13 @@ perfbench measures execution time of code snippets with Timeit and uses Plotly t
 **When not to use the function, you do not need to install orca separately.**
 
 ## Compatibility
-perfbench works with Python 3.4 or higher.
+perfbench works with Python 3.5 or higher.
 
 ## Dependencies
 * [tqdm](https://github.com/tqdm/tqdm)(4.6.1 or higher.)
 * [cerberus](https://github.com/pyeve/cerberus)(1.1 or higher.)
 * [plotly](https://github.com/plotly/plotly.py)(3.0.0 or higher)
-* [notebook](https://github.com/jupyter/notebook)(5.3 or higher.)
+* [notebook](https://github.com/jupyter/notebook)(6.0 or higher.)
 * [ipywidgets](https://github.com/jupyter-widgets/ipywidgets)(7.2 or higher.)
 
 ## Installation
