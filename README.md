@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/Hasenpfote/fpq/blob/master/LICENSE)
-[![Build Status](https://travis-ci.org/Hasenpfote/perfbench.svg?branch=master)](https://travis-ci.org/Hasenpfote/perfbench)
+[![Build Status](https://travis-ci.com/Hasenpfote/perfbench.svg?branch=master)](https://travis-ci.com/Hasenpfote/perfbench)
 [![PyPI version](https://badge.fury.io/py/perfbench.svg)](https://badge.fury.io/py/perfbench)
 [![Pyversions](https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat)](https://img.shields.io/pypi/pyversions/perfbench.svg?style=flat)
 
@@ -7,7 +7,7 @@ perfbench
 =========
 
 ## About
-perfbench measures execution time of code snippets with Timeit and uses Plotly to visualize the results. 
+perfbench measures execution time of code snippets with Timeit and uses Plotly to visualize the results.
 
 ## Feature
 * It is possible to select measurement modes.
@@ -15,8 +15,8 @@ perfbench measures execution time of code snippets with Timeit and uses Plotly t
 * It is possible to switch between axes scales dynamically.
 * It is possible to switch between subplots dynamically.
 * The result of the benchmark can be saved locally as a html.
-* The result of the benchmark can be saved locally as a png.  
-**Requires installation of [orca](https://github.com/plotly/orca).**  
+* The result of the benchmark can be saved locally as a png.
+**Requires installation of [orca](https://github.com/plotly/orca).**
 **When not to use the function, you do not need to install orca separately.**
 
 ## Compatibility
@@ -35,7 +35,7 @@ pip install perfbench
 ```
 
 ## Usage
-**Plotting a single figure.**  
+**Plotting a single figure.**
 [Here](https://plot.ly/~Hasenpfote/8/perfbench-demo1/) is the demonstration.
 ```python
 import numpy as np
@@ -73,7 +73,7 @@ bm.plot()
 ![plot1](https://raw.githubusercontent.com/Hasenpfote/perfbench/master/docs/plotting_a_single_figure.png)
 
 
-**Plotting multiple plots on a single figure.**  
+**Plotting multiple plots on a single figure.**
 [Here](https://plot.ly/~Hasenpfote/9/perfbench-demo2/) is the demonstration.
 ```python
 import numpy as np
@@ -178,7 +178,7 @@ bm.save_as_html(filepath='/path/to/file')
 bm.save_as_png(filepath='/path/to/file', width=1280, height=960)
 ```
 
-**Other**  
+**Other**
 [Here](https://github.com/Hasenpfote/perfbench/tree/master/example) are a few examples.
 
 ## License
